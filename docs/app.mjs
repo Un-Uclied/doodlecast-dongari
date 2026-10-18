@@ -1,4 +1,4 @@
-import {rankPlayers} from './ranking.mjs';
+import {rankPlayers,formatPlayRecord} from './ranking.mjs';
 
 const $ = id => document.getElementById(id);
 const number = n => new Intl.NumberFormat('ko-KR').format(n);
@@ -21,7 +21,10 @@ function render(records=[]) {
   top.forEach((r,i)=>{
     const row=el('tr',i<3?'top-rank':'');
     if(previous.size && previous.get(r.participant_key)!==r.score)row.classList.add('changed');
-    for(const value of [String(i+1).padStart(2,'0'),r.display_name,`${r.character} / ${r.difficulty}`,number(r.score)])row.append(el('td','',value));
+    row.append(el('td','',String(i+1).padStart(2,'0')),el('td','',r.display_name));
+    const play= formatPlayRecord(r), details=el('td','play-record');
+    details.append(el('span','run-summary',play.summary),el('span','run-detail',play.details));
+    row.append(details,el('td','',number(r.score)));
     rows.append(row);
   });
   $('participant-count').textContent=`${number(top.length)}명`;
@@ -51,7 +54,7 @@ try {
   const content=await response.json();prizes=content.prizes;renderBooths(content.booths);render();
   if(demo){
     state('미리보기 · 예시 기록');$('notice').textContent='화면 확인용 예시입니다. 실제 순위가 아닙니다.';$('notice').className='demo-banner';
-    render(Array.from({length:30},(_,i)=>({id:String(i),participant_key:String(i),status:'finished',display_name:`예시 참가자 ${i+1}`,score:40000-i*1190,hits:i,finished_ms:i,character:'마법사',difficulty:['HARD','NORMAL','EASY'][i%3]})));
+    render(Array.from({length:30},(_,i)=>({id:String(i),participant_key:String(i),status:'finished',display_name:`학번 ${11001+i} · 예*자`,score:40000-i*1190,hits:i%6,finished_ms:i,difficulty:['HARD','NORMAL','EASY'][i%3],level:6-i%6,cleared:i%6===0?1:0,kills:80-i,duration_ms:(166+i*7)*1000})));
   } else {
     const [{initializeApp}, {getFirestore,collection,query,orderBy,onSnapshot}, config] = await Promise.all([
       import('https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js'),

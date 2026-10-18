@@ -18,7 +18,10 @@ func test_ranking() -> void:
 	var record := GameRun.ranking_result(false)
 	assert(record.run_id.length() == 32 and record.participant_key == "11013".sha256_text())
 	assert(record.score == 2377 and record.duration_ms == 12399 and record.time_penalty == 123 and record.hits == 2)
-	assert(record.display_name == "학번 **013 · 홍*동" and "11013" not in JSON.stringify(record) and "홍길동" not in JSON.stringify(record))
+	assert(record.display_name == "학번 11013 · 홍*동" and "홍길동" not in JSON.stringify(record))
+	GameRun.set_player_info("00123", "")
+	assert(GameRun.ranking_result(false).display_name == "학번 00123", "Student IDs must remain complete, including leading zeroes")
+	GameRun.set_player_info("11013", "홍길동")
 	GameRun.level_number = 2
 	assert(GameRun.ranking_result(false).run_id == run_id, "All six levels must share one run ID")
 	GameRun.begin_run(0)
@@ -63,5 +66,5 @@ func test_ranking() -> void:
 	assert(client.pending.size() == 1)
 	client.enabled = false
 	client.free()
-	print("PASS: anonymous first-run login, masked identity, six-level run ID, result totals, durable queue/restart, token refresh, retry idempotency, duplicate callback and conflicting record preservation")
+	print("PASS: anonymous first-run login, full student ID/masked name, six-level run ID, result totals, durable queue/restart, token refresh, retry idempotency, duplicate callback and conflicting record preservation")
 	get_tree().quit()

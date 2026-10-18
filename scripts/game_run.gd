@@ -60,7 +60,7 @@ func ranking_result(cleared: bool) -> Dictionary:
 	return {
 		"run_id": run_id,
 		"participant_key": student_id.sha256_text(),
-		"display_name": "학번 **" + student_id.right(3) + (" · " + masked_name.left(12) if not masked_name.is_empty() else ""),
+		"display_name": "학번 " + student_id + (" · " + masked_name.left(12) if not masked_name.is_empty() else ""),
 		"status": "finished", "schema_version": 1,
 		"score": total_score, "combat_score": combat_score, "time_penalty": -time_score(),
 		"duration_ms": floori(elapsed_seconds * 1000.0 + 0.000001),
