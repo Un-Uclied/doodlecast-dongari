@@ -15,6 +15,8 @@ try {
     $env:TEMP, $env:TMP = $previousTemp, $previousTmp
 }
 if ($process.ExitCode -ne 0 -or (Select-String -LiteralPath $exportLog -Pattern '^ERROR:|SCRIPT ERROR' -Quiet)) { throw ('Godot Windows export failed. See ' + $exportLog) }
+$oldPack = Join-Path $output 'DOODLECAST.pck'
+if (Test-Path -LiteralPath $oldPack) { Remove-Item -LiteralPath $oldPack }
 $files = Get-ChildItem -LiteralPath $output -File | Where-Object { $_.Name -eq 'DOODLECAST.exe' -or $_.Extension -eq '.dll' }
 Compress-Archive -LiteralPath $files.FullName -DestinationPath (Join-Path $output 'DOODLECAST-Windows.zip') -Force
 Write-Output (Join-Path $output 'DOODLECAST-Windows.zip')
