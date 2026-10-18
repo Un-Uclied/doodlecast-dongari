@@ -1,0 +1,142 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isStation() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/stations/$(request.auth.uid))
+        && get(/databases/$(database)/documents/stations/$(request.auth.uid)).data.active == true;
+    }
+
+    match /stations/{uid} {
+      allow get: if request.auth != null && request.auth.uid == uid;
+      allow write, list: if false;
+    }
+
+    match /doodlecast_runs/{runId} {
+      allow read: if true;
+      allow create: if request.auth != null
+        && runId.matches('^[a-f0-9]{32}$')
+        && request.resource.data.keys().hasOnly([
+          'owner_uid', 'participant_key', 'display_name', 'status', 'schema_version',
+          'score', 'combat_score', 'time_penalty', 'duration_ms', 'kills', 'hits',
+          'character', 'difficulty', 'level', 'cleared', 'finished_at'
+        ])
+        && request.resource.data.owner_uid == request.auth.uid
+        && request.resource.data.participant_key is string
+        && request.resource.data.participant_key.matches('^[a-f0-9]{64}$')
+        && request.resource.data.display_name is string
+        && request.resource.data.display_name.size() >= 1 && request.resource.data.display_name.size() <= 32
+        && request.resource.data.status == 'finished'
+        && request.resource.data.schema_version == 1
+        && request.resource.data.finished_at == request.time
+        && request.resource.data.character == '마법사'
+        && request.resource.data.difficulty in ['EASY', 'NORMAL', 'HARD']
+        && request.resource.data.score is int && request.resource.data.score >= 0 && request.resource.data.score <= 100000000
+        && request.resource.data.combat_score is int && request.resource.data.combat_score >= 0 && request.resource.data.combat_score <= 100000000
+        && request.resource.data.duration_ms is int && request.resource.data.duration_ms >= 0 && request.resource.data.duration_ms <= 86400000
+        && request.resource.data.time_penalty == int(request.resource.data.duration_ms / 100)
+        && request.resource.data.score == (request.resource.data.combat_score > request.resource.data.time_penalty ? request.resource.data.combat_score - request.resource.data.time_penalty : 0)
+        && request.resource.data.kills is int && request.resource.data.kills >= 0 && request.resource.data.kills <= 10000
+        && request.resource.data.hits is int && request.resource.data.hits >= 0 && request.resource.data.hits <= 5
+        && request.resource.data.level is int && request.resource.data.level >= 1 && request.resource.data.level <= 6
+        && request.resource.data.cleared is int && request.resource.data.cleared in [0, 1]
+        && (request.resource.data.cleared == 0 || request.resource.data.level == 6);
+      allow update, delete: if false;
+    }
+
+    match /arena_runs/{runId} {
+      allow get: if true;
+      allow list: if true; // Public leaderboard includes every participant.
+      allow create: if isStation()
+        && request.resource.data.keys().hasOnly(['owner_uid', 'participant_key', 'display_name', 'attempt', 'status', 'schema_version', 'started_at'])
+        && request.resource.data.owner_uid == request.auth.uid
+        && request.resource.data.participant_key is string
+        && request.resource.data.participant_key.matches('^[a-f0-9]{64}$')
+        && request.resource.data.attempt is int
+        && request.resource.data.attempt in [1, 2]
+        && runId == request.resource.data.participant_key + '-' + string(request.resource.data.attempt)
+        && request.resource.data.display_name is string
+        && request.resource.data.display_name.size() >= 1 && request.resource.data.display_name.size() <= 24
+        && request.resource.data.schema_version == 2
+        && request.resource.data.status == 'started'
+        && request.resource.data.started_at == request.time;
+
+      allow update: if isStation()
+        && resource.data.owner_uid == request.auth.uid
+        && resource.data.status == 'started'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'score', 'damage', 'kills', 'hits', 'boss_kills', 'duration_ms', 'survived', 'character', 'difficulty', 'finished_at'])
+        && request.resource.data.status == 'finished'
+        && request.resource.data.finished_at == request.time
+        && request.resource.data.character in ['스트라이커', '브루저', '레인저']
+        && request.resource.data.difficulty in ['안정', '과부하', '임계']
+        && request.resource.data.score is int && request.resource.data.score >= 0 && request.resource.data.score <= 1000000
+        && request.resource.data.damage is int && request.resource.data.damage >= 0 && request.resource.data.damage <= 200000
+        && request.resource.data.kills is int && request.resource.data.kills >= 0 && request.resource.data.kills <= 500
+        && request.resource.data.hits is int && request.resource.data.hits >= 0 && request.resource.data.hits <= 5
+        && request.resource.data.boss_kills is int && request.resource.data.boss_kills in [0, 1]
+        && request.resource.data.survived is int && request.resource.data.survived in [0, 1]
+        && request.resource.data.duration_ms is int && request.resource.data.duration_ms >= 1 && request.resource.data.duration_ms <= 90000
+        && (request.resource.data.survived == 0 || request.resource.data.duration_ms == 90000)
+        && validScore(request.resource.data);
+
+      function validScore(d) {
+        let multiplier = d.difficulty == '임계' ? 2.2 : (d.difficulty == '과부하' ? 1.5 : 1.0);
+        return d.score == int((d.damage + d.kills * 100 + d.boss_kills * 2000 + d.survived * 1000) * multiplier);
+      }
+      allow delete: if false;
+    }
+
+    match /runs/{runId} {
+      allow read: if request.auth != null;
+
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasAll([
+          'student_id', 'attempt', 'owner_uid', 'station', 'status'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'student_id', 'attempt', 'owner_uid', 'station', 'status'
+        ])
+        && request.resource.data.student_id is string
+        && request.resource.data.student_id.matches('^[0-9]{4,10}$')
+        && request.resource.data.attempt is string
+        && (request.resource.data.attempt == '1' || request.resource.data.attempt == '2')
+        && runId == request.resource.data.student_id + '-' + request.resource.data.attempt
+        && request.resource.data.owner_uid == request.auth.uid
+        && request.resource.data.station is string
+        && request.resource.data.station.size() >= 1
+        && request.resource.data.station.size() <= 64
+        && request.resource.data.status == 'started';
+
+      allow update: if request.auth != null
+        && resource.data.owner_uid == request.auth.uid
+        && resource.data.status == 'started'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'status', 'score', 'grazes', 'hits', 'max_combo', 'duration_ms'
+        ])
+        && request.resource.data.status == 'finished'
+        && request.resource.data.score is int
+        && request.resource.data.score >= 0
+        && request.resource.data.score <= 10000000
+        && request.resource.data.grazes is int
+        && request.resource.data.grazes >= 0
+        && request.resource.data.grazes <= 100000
+        && request.resource.data.hits is int
+        && request.resource.data.hits >= 0
+        && request.resource.data.hits <= 500
+        && request.resource.data.max_combo is int
+        && request.resource.data.max_combo >= 0
+        && request.resource.data.max_combo <= request.resource.data.grazes
+        && request.resource.data.duration_ms is int
+        && request.resource.data.duration_ms >= 55000
+        && request.resource.data.duration_ms <= 70000
+        && request.resource.data.score <= request.resource.data.grazes * 1000;
+
+      allow delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

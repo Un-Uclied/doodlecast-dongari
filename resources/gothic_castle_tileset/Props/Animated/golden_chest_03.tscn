@@ -1,0 +1,9 @@
+[gd_scene format=3]
+
+[ext_resource type="SpriteFrames" path="res://resources/gothic_castle_tileset/Props/Animated/golden_chest_03_frames.tres" id="1_uoer0"]
+
+[node name="GoldenChest03" type="AnimatedSprite2D" unique_id=940906797]
+texture_filter = 1
+sprite_frames = ExtResource("1_uoer0")
+animation = &"closed"
+offset = Vector2(0, -16)

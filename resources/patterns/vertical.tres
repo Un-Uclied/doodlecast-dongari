@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="PatternDefinition" format=3 uid="uid://ctxpshoukne25"]
+
+[ext_resource type="Script" uid="uid://38p8rxpvq4ik" path="res://scripts/gestures/pattern_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"vertical"
+display_name = "세로선 |"
+samples = Array[PackedVector2Array]([PackedVector2Array(0, 0, 0, 1)])
+max_error = 0.065

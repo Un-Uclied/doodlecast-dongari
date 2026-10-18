@@ -1,0 +1,125 @@
+extends SceneTree
+
+func _initialize() -> void:
+	call_deferred("test_player")
+
+func key(code: Key, pressed: bool) -> void:
+	var event := InputEventKey.new()
+	event.keycode = code
+	event.physical_keycode = code
+	event.pressed = pressed
+	Input.parse_input_event(event)
+	Input.flush_buffered_events()
+
+func ticks(count := 1) -> void:
+	for i in range(count):
+		await physics_frame
+		await process_frame
+
+func test_player() -> void:
+	create_timer(12.0).timeout.connect(func(): quit(1))
+	var player := (load("res://scenes/player.tscn") as PackedScene).instantiate()
+	root.add_child(player)
+	await ticks(2)
+	var frames: SpriteFrames = player.sprite.sprite_frames
+	assert(frames.get_animation_names().size() == 8, "Only four-direction idle and walk animations are available")
+	for direction in ["north", "south", "west", "east"]:
+		assert(frames.get_frame_count("idle_" + direction) == 5)
+		assert(frames.get_frame_count("walk_" + direction) == 4)
+	assert((frames.get_frame_texture("idle_south", 0) as AtlasTexture).atlas.resource_path == "res://image_assets/Free - Pixel Art Character 1/Idle/Blue_Head_Idle-Sheet.png")
+	assert((frames.get_frame_texture("walk_south", 0) as AtlasTexture).atlas.resource_path == "res://image_assets/Free - Pixel Art Character 1/Walking/Blue_Head_Walking-Sheet.png")
+	var dash_ticks := ceili(player.DASH_DURATION * Engine.physics_ticks_per_second) + 1
+	var start: Vector2 = player.position
+	key(KEY_W, true)
+	await ticks(2)
+	assert(player.position.y < start.y and player.velocity.y < 0)
+	assert(player.sprite.animation == "walk_north")
+	key(KEY_D, true)
+	await ticks(2)
+	assert(is_equal_approx(player.velocity.length(), player.MOVE_SPEED), "Diagonal movement must be normalized")
+	key(KEY_W, false)
+	await ticks(2)
+	assert(player.sprite.animation == "walk_east" and not player.sprite.flip_h)
+	key(KEY_D, false)
+	key(KEY_A, true)
+	await ticks(2)
+	assert(player.velocity.x < 0 and player.sprite.animation == "walk_west" and not player.sprite.flip_h)
+	key(KEY_A, false)
+	key(KEY_S, true)
+	await ticks(2)
+	assert(player.velocity.y > 0 and player.sprite.animation == "walk_south")
+	key(KEY_S, false)
+	key(KEY_D, true)
+	await ticks(2)
+	key(KEY_SHIFT, true)
+	await ticks()
+	assert(player.is_invulnerable and player.velocity.length() > player.MOVE_SPEED)
+	assert(player.get_node("DashSound").playing, "Accepted dashes must play dash.wav")
+	assert(player.get_node("DashParticles").emitting and not player.get_node("DashParticles").local_coords)
+	assert(player.get_node("DashParticles").direction == Vector2.LEFT, "Dash particles must trail opposite the dash direction")
+	player.get_node("DashSound").stop()
+	assert(player.sprite.animation == "walk_east")
+	assert(not player.take_damage() and not player.is_dead)
+	assert(player.collision_layer == 2 and player.collision_mask == 1)
+	assert(player.get_node("Camera2D").is_current())
+	assert(player.get_node("Camera2D").global_position.is_equal_approx(player.global_position + Vector2(0, -16)))
+	await ticks(dash_ticks)
+	assert(not player.is_invulnerable and player.dash_cooldown_left > 0.0)
+	assert(not player.get_node("DashParticles").emitting, "Dash completion must stop new particles")
+	key(KEY_SHIFT, false)
+	await ticks()
+	key(KEY_SHIFT, true)
+	await ticks()
+	assert(not player.is_invulnerable, "Cooldown must reject a second dash")
+	assert(not player.get_node("DashSound").playing, "Rejected dashes must stay silent")
+	key(KEY_SHIFT, false)
+	key(KEY_D, false)
+	await ticks(30)
+	key(KEY_SHIFT, true)
+	await ticks()
+	assert(player.is_invulnerable and player.dash_direction == Vector2.RIGHT, "Standing dash uses the last facing direction")
+	key(KEY_SHIFT, false)
+	await ticks(dash_ticks)
+	var hurt_ticks := ceili(player.hurt_invulnerability_duration * Engine.physics_ticks_per_second) + 1
+	for hit in range(4):
+		assert(player.take_damage() and not player.is_dead)
+		assert(player.health == 4 - hit, "Each hit removes one of five health points")
+		assert(player.is_invulnerable and not player.take_damage(), "A hit must block immediate repeat damage")
+		await ticks(hurt_ticks)
+		assert(not player.is_invulnerable, "Hurt immunity must expire")
+	assert(player.take_damage() and player.health == 0 and player.is_dead and not player.sprite.is_playing())
+	assert(not player.take_damage(), "Dead players must not take further damage")
+	assert(not player.get_node("DashParticles").emitting)
+	player.free()
+	var map := (load("res://scenes/test_scene.tscn") as PackedScene).instantiate()
+	root.add_child(map)
+	player = map.get_node("Player")
+	await ticks(2)
+	assert(not player.is_dead)
+	player.position = Vector2(-500, 500)
+	await ticks(2)
+	assert(not player.is_dead, "Leaving the map must not cause pit death")
+	player.position = Vector2(40, 8)
+	key(KEY_W, true)
+	await ticks(4)
+	assert(player.position.y >= 6.9, "Walking must stop at the wall")
+	key(KEY_SHIFT, true)
+	await ticks(2)
+	assert(player.is_invulnerable and player.position.y >= 6.9, "Dash must not pass through walls")
+	key(KEY_SHIFT, false)
+	key(KEY_W, false)
+	await ticks(35)
+	player.position = Vector2(40, 40)
+	var deaths: Array[bool] = []
+	player.died.connect(func(by_falling: bool): deaths.append(by_falling))
+	key(KEY_SHIFT, true)
+	await ticks()
+	assert(player.is_invulnerable and not player.is_dead)
+	var pit := (load("res://scenes/pit.tscn") as PackedScene).instantiate() as Area2D
+	pit.position = player.global_position + player.dash_direction * 8
+	map.add_child(pit)
+	await ticks(2)
+	assert(player.is_dead and deaths == [true] and not player.sprite.is_playing(), "Dash invulnerability must not protect against pits")
+	key(KEY_SHIFT, false)
+	print("PASS: player animations, movement, dash/cooldown and immunity, timed hurt immunity, five-health damage/death, camera, wall collision, map exit safety, pit death during dash")
+	quit()

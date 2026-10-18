@@ -1,0 +1,80 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" uid="uid://0dmtivq4tmd3" path="res://image_assets/Gothic Castle Tileset/Props/Animated_Props/spiked_floor_01.png" id="1_hfb38"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4ilp3"]
+atlas = ExtResource("1_hfb38")
+region = Rect2(0, 0, 16, 16)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cadpu"]
+atlas = ExtResource("1_hfb38")
+region = Rect2(16, 0, 16, 16)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j84qq"]
+atlas = ExtResource("1_hfb38")
+region = Rect2(32, 0, 16, 16)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2malf"]
+atlas = ExtResource("1_hfb38")
+region = Rect2(32, 0, 16, 16)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_isxot"]
+atlas = ExtResource("1_hfb38")
+region = Rect2(16, 0, 16, 16)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_yugk3"]
+atlas = ExtResource("1_hfb38")
+region = Rect2(0, 0, 16, 16)
+filter_clip = true
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4ilp3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cadpu")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_j84qq")
+}],
+"loop": 0,
+"name": &"extend",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_j84qq")
+}],
+"loop": 0,
+"name": &"extended",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2malf")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_isxot")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_yugk3")
+}],
+"loop": 0,
+"name": &"retract",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4ilp3")
+}],
+"loop": 0,
+"name": &"retracted",
+"speed": 5.0
+}]

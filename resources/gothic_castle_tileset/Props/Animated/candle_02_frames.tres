@@ -1,0 +1,43 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" uid="uid://lxpuwgqj7by" path="res://image_assets/Gothic Castle Tileset/Props/Animated_Props/candle_02.png" id="1_chetn"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_t5myk"]
+atlas = ExtResource("1_chetn")
+region = Rect2(0, 0, 16, 16)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ws5cn"]
+atlas = ExtResource("1_chetn")
+region = Rect2(16, 0, 16, 16)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8hucm"]
+atlas = ExtResource("1_chetn")
+region = Rect2(32, 0, 16, 16)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_4w0if"]
+atlas = ExtResource("1_chetn")
+region = Rect2(48, 0, 16, 16)
+filter_clip = true
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_t5myk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ws5cn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8hucm")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_4w0if")
+}],
+"loop": 1,
+"name": &"idle",
+"speed": 6.0
+}]

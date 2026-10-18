@@ -1,0 +1,12 @@
+[gd_scene format=3 uid="uid://cnm75cppi87jm"]
+
+[ext_resource type="SpriteFrames" uid="uid://cxw8j5tmw7snl" path="res://resources/gothic_castle_tileset/Characters/block_frames.tres" id="1_f4ns5"]
+
+[node name="Block" type="AnimatedSprite2D" unique_id=43482210]
+texture_filter = 1
+sprite_frames = ExtResource("1_f4ns5")
+animation = &"west"
+autoplay = "idle"
+frame = 4
+frame_progress = 1.0
+offset = Vector2(0, -8)

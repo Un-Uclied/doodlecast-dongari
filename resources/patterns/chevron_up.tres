@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="PatternDefinition" format=3 uid="uid://u3uojcpm16im"]
+
+[ext_resource type="Script" uid="uid://38p8rxpvq4ik" path="res://scripts/gestures/pattern_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"chevron_up"
+display_name = "위로 꺾인 선 ∧"
+samples = Array[PackedVector2Array]([PackedVector2Array(0, 0.65, 0.5, 0, 1, 0.65), PackedVector2Array(0, 0.35, 0.5, 0, 1, 0.35), PackedVector2Array(0, 1, 0.5, 0, 1, 1), PackedVector2Array(0, 0.35, 0.25, 0, 1, 0.85), PackedVector2Array(0, 0.85, 0.75, 0, 1, 0.35), PackedVector2Array(0, 0.25, 0.2, 0, 1, 0.55), PackedVector2Array(0, 0.55, 0.8, 0, 1, 0.25)])

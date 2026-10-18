@@ -1,0 +1,9 @@
+[gd_scene format=3]
+
+[ext_resource type="SpriteFrames" path="res://resources/gothic_castle_tileset/Props/Animated/spiked_floor_01_frames.tres" id="1_1xlx1"]
+
+[node name="SpikedFloor01" type="AnimatedSprite2D" unique_id=1841330331]
+texture_filter = 1
+sprite_frames = ExtResource("1_1xlx1")
+animation = &"retracted"
+offset = Vector2(0, -8)

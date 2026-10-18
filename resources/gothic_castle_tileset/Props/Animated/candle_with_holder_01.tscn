@@ -1,0 +1,10 @@
+[gd_scene format=3]
+
+[ext_resource type="SpriteFrames" path="res://resources/gothic_castle_tileset/Props/Animated/candle_with_holder_01_frames.tres" id="1_o5u4g"]
+
+[node name="CandleWithHolder01" type="AnimatedSprite2D" unique_id=904356121]
+texture_filter = 1
+sprite_frames = ExtResource("1_o5u4g")
+animation = &"idle"
+autoplay = "idle"
+offset = Vector2(0, -8)

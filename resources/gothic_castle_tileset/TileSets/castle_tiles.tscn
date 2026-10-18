@@ -1,0 +1,7 @@
+[gd_scene format=3]
+
+[ext_resource type="TileSet" uid="uid://cn11mn80jwqo6" path="res://resources/GothicCastle/TileSets/castle_tileset.tres" id="1_v8omc"]
+
+[node name="CastleTiles" type="TileMapLayer" unique_id=1803115406]
+texture_filter = 1
+tile_set = ExtResource("1_v8omc")

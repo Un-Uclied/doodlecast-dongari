@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" uid="uid://cokxkca1rwc3h" path="res://image_assets/Gothic Castle Tileset/Props/Individual_Props/lantern_floor_01.png" id="1_08rqc"]
+
+[node name="LanternFloor01" type="Sprite2D" unique_id=679829476]
+texture_filter = 1
+texture = ExtResource("1_08rqc")
+offset = Vector2(0, -16)

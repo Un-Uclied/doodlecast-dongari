@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" uid="uid://bpjo2goevl2hg" path="res://image_assets/Gothic Castle Tileset/Props/Individual_Props/wall_lantern_right_02.png" id="1_mr3kp"]
+
+[node name="WallLanternRight02" type="Sprite2D" unique_id=1027611589]
+texture_filter = 1
+texture = ExtResource("1_mr3kp")
+offset = Vector2(0, -8)

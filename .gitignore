@@ -1,0 +1,11 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+/builds/
+.env
+.env.*
+!.env.example
+*service-account*.json
+*firebase-adminsdk*.json
+*.log
+/node_modules/

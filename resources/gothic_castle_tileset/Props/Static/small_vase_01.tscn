@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" uid="uid://cvljs2ex8gvwp" path="res://image_assets/Gothic Castle Tileset/Props/Individual_Props/small_vase_01.png" id="1_8qo5y"]
+
+[node name="SmallVase01" type="Sprite2D" unique_id=1416468246]
+texture_filter = 1
+texture = ExtResource("1_8qo5y")
+offset = Vector2(0, -8)

@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="TileSet" path="res://resources/Dungeon/TileSets/dungeon_tileset.tres" id="1"]
+
+[node name="DungeonTiles" type="TileMapLayer"]
+texture_filter = 1
+tile_set = ExtResource("1")

@@ -1,0 +1,85 @@
+[gd_resource type="Theme" format=3 uid="uid://di013qfonntde"]
+
+[ext_resource type="FontFile" uid="uid://5gvvdc8xlbst" path="res://fonts/PF스타더스트 3.0 Bold.ttf" id="1_body"]
+[ext_resource type="FontFile" uid="uid://cpo53il2jcgk" path="res://fonts/Cafe24PROUP.ttf" id="2_heading"]
+
+[sub_resource type="StyleBoxFlat" id="ButtonNormal"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(0.17, 0.085, 0.21, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.48, 0.32, 0.22, 1)
+
+[sub_resource type="StyleBoxFlat" id="ButtonFocus"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(0, 0, 0, 0)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(1, 0.79, 0.37, 1)
+
+[sub_resource type="StyleBoxFlat" id="ButtonHover"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(0.27, 0.14, 0.3, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.48, 0.32, 0.22, 1)
+
+[sub_resource type="StyleBoxFlat" id="ButtonPressed"]
+content_margin_left = 16.0
+content_margin_top = 8.0
+content_margin_right = 16.0
+content_margin_bottom = 8.0
+bg_color = Color(0.1, 0.045, 0.13, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.48, 0.32, 0.22, 1)
+
+[sub_resource type="StyleBoxFlat" id="Input"]
+content_margin_left = 10.0
+content_margin_top = 5.0
+content_margin_right = 10.0
+content_margin_bottom = 5.0
+bg_color = Color(0.09, 0.04, 0.12, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.4, 0.25, 0.41, 1)
+
+[resource]
+default_font = ExtResource("1_body")
+default_font_size = 18
+Button/colors/font_color = Color(0.97, 0.88, 0.68, 1)
+Button/colors/font_color_disabled = Color(0.45, 0.35, 0.43, 1)
+Button/colors/font_focus_color = Color(1, 0.87, 0.52, 1)
+Button/colors/font_hover_color = Color(1, 0.87, 0.52, 1)
+Button/fonts/font = ExtResource("2_heading")
+Button/styles/disabled = SubResource("ButtonNormal")
+Button/styles/focus = SubResource("ButtonFocus")
+Button/styles/hover = SubResource("ButtonHover")
+Button/styles/normal = SubResource("ButtonNormal")
+Button/styles/pressed = SubResource("ButtonPressed")
+Label/colors/font_color = Color(0.95, 0.87, 0.71, 1)
+LineEdit/colors/caret_color = Color(1, 0.8, 0.4, 1)
+LineEdit/colors/font_color = Color(0.97, 0.88, 0.72, 1)
+LineEdit/colors/font_placeholder_color = Color(0.61, 0.47, 0.63, 1)
+LineEdit/colors/selection_color = Color(0.55, 0.32, 0.64, 0.65)
+LineEdit/styles/focus = SubResource("ButtonFocus")
+LineEdit/styles/normal = SubResource("Input")

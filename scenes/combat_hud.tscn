@@ -1,0 +1,541 @@
+[gd_scene format=3 uid="uid://bcf2wadlkpunp"]
+
+[ext_resource type="FontFile" uid="uid://5gvvdc8xlbst" path="res://fonts/PF스타더스트 3.0 Bold.ttf" id="1_body"]
+[ext_resource type="FontFile" uid="uid://cpo53il2jcgk" path="res://fonts/Cafe24PROUP.ttf" id="2_heading"]
+[ext_resource type="Script" uid="uid://ckgihywd6fveu" path="res://scripts/combat_hud.gd" id="3_hud"]
+
+[ext_resource type="ShaderMaterial" path="res://resources/effects/menu_background.tres" id="4_background"]
+
+[ext_resource type="Theme" path="res://resources/ui/menu_theme.tres" id="5_theme"]
+
+[ext_resource type="Script" path="res://scripts/arcane_frame.gd" id="6_frame"]
+
+[sub_resource type="StyleBoxFlat" id="Card"]
+bg_color = Color(0.105, 0.05, 0.13, 0.99)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.45, 0.29, 0.19, 1)
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_left = 0
+corner_radius_bottom_right = 0
+content_margin_left = 24.0
+content_margin_top = 20.0
+content_margin_right = 24.0
+content_margin_bottom = 20.0
+shadow_color = Color(0, 0, 0, 0.45)
+shadow_size = 12
+
+[sub_resource type="StyleBoxFlat" id="Stats"]
+bg_color = Color(0.075, 0.032, 0.095, 1)
+corner_radius_top_left = 0
+corner_radius_top_right = 0
+corner_radius_bottom_left = 0
+corner_radius_bottom_right = 0
+content_margin_left = 16.0
+content_margin_top = 12.0
+content_margin_right = 16.0
+content_margin_bottom = 12.0
+
+[sub_resource type="StyleBoxFlat" id="ComboBackground"]
+bg_color = Color(0.12, 0.055, 0.14, 0.9)
+
+[sub_resource type="StyleBoxFlat" id="ComboFill"]
+bg_color = Color(1, 0.82, 0.25, 1)
+
+[node name="HUD" type="CanvasLayer" unique_id=284878472]
+process_mode = 3
+layer = 20
+script = ExtResource("3_hud")
+
+[node name="Root" type="Control" parent="." unique_id=463854003]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("5_theme")
+
+[node name="Top" type="HBoxContainer" parent="Root" unique_id=1446507288]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 20.0
+offset_top = 18.0
+offset_right = -20.0
+offset_bottom = 58.000008
+grow_horizontal = 2
+scale = Vector2(1, 1.0159808)
+mouse_filter = 2
+theme_override_constants/separation = 24
+
+[node name="Health" type="Label" parent="Root/Top" unique_id=494450670]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.55, 0.6, 1)
+theme_override_fonts/font = ExtResource("2_heading")
+text = "HP  5 / 5"
+
+[node name="Stage" type="Label" parent="Root/Top" unique_id=1520970113]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("2_heading")
+text = "NORMAL  1 / 6 · DIFF 2"
+
+[node name="RemainingSlot" type="Control" parent="Root/Top"]
+custom_minimum_size = Vector2(100, 24)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="Remaining" type="Label" parent="Root/Top/RemainingSlot" unique_id=1691272081]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("2_heading")
+text = "남은 적  0"
+vertical_alignment = 1
+
+[node name="ScorePanel" type="VBoxContainer" parent="Root/Top"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Score" type="Label" parent="Root/Top/ScorePanel" unique_id=115033498]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.88, 0.4, 1)
+theme_override_fonts/font = ExtResource("2_heading")
+text = "SCORE  0"
+
+[node name="Combo" type="HBoxContainer" parent="Root/Top/ScorePanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="ComboRank" type="Label" parent="Root/Top/ScorePanel/Combo"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.88, 0.4, 1)
+theme_override_fonts/font = ExtResource("2_heading")
+theme_override_font_sizes/font_size = 16
+text = "D  ×1.0"
+
+[node name="ComboGauge" type="ProgressBar" parent="Root/Top/ScorePanel/Combo"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(140, 10)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+theme_override_styles/background = SubResource("ComboBackground")
+theme_override_styles/fill = SubResource("ComboFill")
+step = 0.01
+show_percentage = false
+
+[node name="PauseButton" type="Button" parent="Root/Top" unique_id=2079843008]
+unique_name_in_owner = true
+layout_mode = 2
+text = "일시정지 (Esc)"
+
+[node name="Results" type="ColorRect" parent="Root"]
+unique_name_in_owner = true
+visible = false
+material = ExtResource("4_background")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Margin" type="MarginContainer" parent="Root/Results"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="Scroll" type="ScrollContainer" parent="Root/Results/Margin"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+follow_focus = true
+
+[node name="Center" type="CenterContainer" parent="Root/Results/Margin/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Card" type="PanelContainer" parent="Root/Results/Margin/Scroll/Center"]
+custom_minimum_size = Vector2(560, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("Card")
+script = ExtResource("6_frame")
+
+[node name="Rows" type="VBoxContainer" parent="Root/Results/Margin/Scroll/Center/Card"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ResultTitle" type="Label" parent="Root/Results/Margin/Scroll/Center/Card/Rows"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_heading")
+theme_override_font_sizes/font_size = 36
+text = "GAME OVER"
+horizontal_alignment = 1
+
+[node name="ResultStage" type="Label" parent="Root/Results/Margin/Scroll/Center/Card/Rows"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.62, 0.77, 1)
+theme_override_font_sizes/font_size = 16
+text = "NORMAL  ·  레벨 1 / 6"
+horizontal_alignment = 1
+
+[node name="ResultIdentity" type="Label" parent="Root/Results/Margin/Scroll/Center/Card/Rows"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.62, 0.77, 1)
+theme_override_font_sizes/font_size = 16
+text = "학번 10101"
+horizontal_alignment = 1
+
+[node name="Total" type="VBoxContainer" parent="Root/Results/Margin/Scroll/Center/Card/Rows"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Caption" type="Label" parent="Root/Results/Margin/Scroll/Center/Card/Rows/Total"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "총합 점수"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.85, 0.74, 0.56, 1)
+
+[node name="ResultTotal" type="Label" parent="Root/Results/Margin/Scroll/Center/Card/Rows/Total"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_heading")
+theme_override_font_sizes/font_size = 48
+theme_override_colors/font_color = Color(1, 0.85, 0.4, 1)
+text = "19862"
+horizontal_alignment = 1
+
+[node name="Stats" type="PanelContainer" parent="Root/Results/Margin/Scroll/Center/Card/Rows"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("Stats")
+
+[node name="Grid" type="GridContainer" parent="Root/Results/Margin/Scroll/Center/Card/Rows/Stats"]
+layout_mode = 2
+theme_override_constants/h_separation = 32
+theme_override_constants/v_separation = 5
+columns = 2
+
+[node name="LevelScoreCaption" type="Label" parent="Root/Results/Margin/Scroll/Center/Card/Rows/Stats/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.73, 0.60, 0.75, 1)
+text = "이번 레벨"
+
+[node name="ResultLevelScore" type="Label" parent="Root/Results/Margin/Scroll/Center/Card/Rows/Stats/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.97, 0.89, 0.72, 1)
+text = "+2159점"
+horizontal_alignment = 2
+
+[node name="CombatScoreCaption" type="Label" parent="Root/Results/Margin/Scroll/Center/Card/Rows/Stats/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.73, 0.60, 0.75, 1)
+text = "처치·클리어 점수"
+
+[node name="ResultCombatScore" type="Label" parent="Root/Results/Margin/Scroll/Center/Card/Rows/Stats/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.97, 0.89, 0.72, 1)
+text = "21525점"
+horizontal_alignment = 2
+
+[node name="ElapsedCaption" type="Label" parent="Root/Results/Margin/Scroll/Center/Card/Rows/Stats/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.73, 0.60, 0.75, 1)
+text = "경과 시간"
+
+[node name="ResultElapsed" type="Label" parent="Root/Results/Margin/Scroll/Center/Card/Rows/Stats/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.97, 0.89, 0.72, 1)
+text = "166.3초"
+horizontal_alignment = 2
+
+[node name="PenaltyCaption" type="Label" parent="Root/Results/Margin/Scroll/Center/Card/Rows/Stats/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.73, 0.60, 0.75, 1)
+text = "시간 감점"
+
+[node name="ResultPenalty" type="Label" parent="Root/Results/Margin/Scroll/Center/Card/Rows/Stats/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(1, 0.6, 0.6, 1)
+text = "-1663점"
+horizontal_alignment = 2
+
+[node name="KillsCaption" type="Label" parent="Root/Results/Margin/Scroll/Center/Card/Rows/Stats/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.73, 0.60, 0.75, 1)
+text = "누적 처치"
+
+[node name="ResultKills" type="Label" parent="Root/Results/Margin/Scroll/Center/Card/Rows/Stats/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.97, 0.89, 0.72, 1)
+text = "62마리"
+horizontal_alignment = 2
+
+[node name="HealthCaption" type="Label" parent="Root/Results/Margin/Scroll/Center/Card/Rows/Stats/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.73, 0.60, 0.75, 1)
+text = "남은 체력"
+
+[node name="ResultHealth" type="Label" parent="Root/Results/Margin/Scroll/Center/Card/Rows/Stats/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.97, 0.89, 0.72, 1)
+text = "0 / 5"
+horizontal_alignment = 2
+
+[node name="ModeMultiplierCaption" type="Label" parent="Root/Results/Margin/Scroll/Center/Card/Rows/Stats/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.73, 0.60, 0.75, 1)
+text = "난이도 배율"
+
+[node name="ResultModeMultiplier" type="Label" parent="Root/Results/Margin/Scroll/Center/Card/Rows/Stats/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.97, 0.89, 0.72, 1)
+text = "×1.00"
+horizontal_alignment = 2
+
+[node name="ComboMultiplierCaption" type="Label" parent="Root/Results/Margin/Scroll/Center/Card/Rows/Stats/Grid"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.73, 0.60, 0.75, 1)
+text = "콤보 배율"
+
+[node name="ResultComboMultiplier" type="Label" parent="Root/Results/Margin/Scroll/Center/Card/Rows/Stats/Grid"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.97, 0.89, 0.72, 1)
+text = "D  ×1.0"
+horizontal_alignment = 2
+
+[node name="RankingStatus" type="Label" parent="Root/Results/Margin/Scroll/Center/Card/Rows"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.73, 0.60, 0.75, 1)
+horizontal_alignment = 1
+
+[node name="Actions" type="HBoxContainer" parent="Root/Results/Margin/Scroll/Center/Card/Rows"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Continue" type="Button" parent="Root/Results/Margin/Scroll/Center/Card/Rows/Actions"]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "다음 레벨"
+
+[node name="Menu" type="Button" parent="Root/Results/Margin/Scroll/Center/Card/Rows/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "메인 메뉴로"
+
+[node name="Paused" type="ColorRect" parent="Root"]
+unique_name_in_owner = true
+visible = false
+material = ExtResource("4_background")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Margin" type="MarginContainer" parent="Root/Paused"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="Scroll" type="ScrollContainer" parent="Root/Paused/Margin"]
+layout_mode = 2
+horizontal_scroll_mode = 0
+follow_focus = true
+
+[node name="Center" type="CenterContainer" parent="Root/Paused/Margin/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Card" type="PanelContainer" parent="Root/Paused/Margin/Scroll/Center"]
+custom_minimum_size = Vector2(560, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("Card")
+script = ExtResource("6_frame")
+
+[node name="Rows" type="VBoxContainer" parent="Root/Paused/Margin/Scroll/Center/Card"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Root/Paused/Margin/Scroll/Center/Card/Rows"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_heading")
+theme_override_font_sizes/font_size = 36
+theme_override_colors/font_color = Color(0.86, 0.66, 1, 1)
+text = "일시정지"
+horizontal_alignment = 1
+
+[node name="PauseStage" type="Label" parent="Root/Paused/Margin/Scroll/Center/Card/Rows"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.73, 0.60, 0.75, 1)
+text = "NORMAL  ·  레벨 1 / 6"
+horizontal_alignment = 1
+
+[node name="Hint" type="Label" parent="Root/Paused/Margin/Scroll/Center/Card/Rows"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.85, 0.74, 0.56, 1)
+text = "준비되면 계속하세요."
+horizontal_alignment = 1
+
+[node name="Resume" type="Button" parent="Root/Paused/Margin/Scroll/Center/Card/Rows"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+text = "계속하기 (Esc)"
+
+[node name="PauseMenu" type="Button" parent="Root/Paused/Margin/Scroll/Center/Card/Rows"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+text = "메인 메뉴로"
+
+[node name="MenuConfirmation" type="ColorRect" parent="Root"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.025, 0.01, 0.035, 0.8)
+
+[node name="Center" type="CenterContainer" parent="Root/MenuConfirmation"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Card" type="PanelContainer" parent="Root/MenuConfirmation/Center"]
+custom_minimum_size = Vector2(460, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("Card")
+script = ExtResource("6_frame")
+
+[node name="Rows" type="VBoxContainer" parent="Root/MenuConfirmation/Center/Card"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Title" type="Label" parent="Root/MenuConfirmation/Center/Card/Rows"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_heading")
+theme_override_font_sizes/font_size = 26
+theme_override_colors/font_color = Color(1, 0.85, 0.48, 1)
+text = "메인 메뉴로 돌아갈까요?"
+horizontal_alignment = 1
+
+[node name="Hint" type="Label" parent="Root/MenuConfirmation/Center/Card/Rows"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "현재 게임을 종료하고 메인 메뉴로 이동합니다."
+horizontal_alignment = 1
+
+[node name="Actions" type="HBoxContainer" parent="Root/MenuConfirmation/Center/Card/Rows"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ExitCancel" type="Button" parent="Root/MenuConfirmation/Center/Card/Rows/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_neighbor_left = NodePath("../ExitConfirm")
+focus_neighbor_top = NodePath("../ExitConfirm")
+focus_neighbor_right = NodePath("../ExitConfirm")
+focus_neighbor_bottom = NodePath("../ExitConfirm")
+focus_next = NodePath("../ExitConfirm")
+focus_previous = NodePath("../ExitConfirm")
+text = "취소"
+
+[node name="ExitConfirm" type="Button" parent="Root/MenuConfirmation/Center/Card/Rows/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_neighbor_left = NodePath("../ExitCancel")
+focus_neighbor_top = NodePath("../ExitCancel")
+focus_neighbor_right = NodePath("../ExitCancel")
+focus_neighbor_bottom = NodePath("../ExitCancel")
+focus_next = NodePath("../ExitCancel")
+focus_previous = NodePath("../ExitCancel")
+text = "나가기"

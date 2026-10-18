@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="PatternCatalog" format=3 uid="uid://cdwsyt4bukqc0"]
+
+[ext_resource type="Script" uid="uid://ckwfdn2w52r1v" path="res://scripts/gestures/pattern_catalog.gd" id="1"]
+[ext_resource type="Script" uid="uid://38p8rxpvq4ik" path="res://scripts/gestures/pattern_definition.gd" id="2"]
+[ext_resource type="Resource" uid="uid://dxno8ddiff4vy" path="res://resources/patterns/horizontal.tres" id="3"]
+[ext_resource type="Resource" uid="uid://ctxpshoukne25" path="res://resources/patterns/vertical.tres" id="4"]
+[ext_resource type="Resource" uid="uid://u3uojcpm16im" path="res://resources/patterns/chevron_up.tres" id="5"]
+[ext_resource type="Resource" path="res://resources/patterns/chevron_down.tres" id="6"]
+[ext_resource type="Resource" path="res://resources/patterns/star.tres" id="7"]
+[ext_resource type="Resource" path="res://resources/patterns/spiral.tres" id="8"]
+
+[resource]
+script = ExtResource("1")
+patterns = Array[ExtResource("2")]([ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7"), ExtResource("8")])

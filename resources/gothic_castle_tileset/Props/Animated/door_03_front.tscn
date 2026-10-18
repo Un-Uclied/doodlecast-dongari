@@ -1,0 +1,9 @@
+[gd_scene format=3]
+
+[ext_resource type="SpriteFrames" path="res://resources/gothic_castle_tileset/Props/Animated/door_03_front_frames.tres" id="1_0vn7y"]
+
+[node name="Door03Front" type="AnimatedSprite2D" unique_id=566882400]
+texture_filter = 1
+sprite_frames = ExtResource("1_0vn7y")
+animation = &"closed"
+offset = Vector2(0, -16)

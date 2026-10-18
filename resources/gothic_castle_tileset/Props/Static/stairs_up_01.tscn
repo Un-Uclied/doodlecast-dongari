@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" uid="uid://r028oy55pjcs" path="res://image_assets/Gothic Castle Tileset/Props/Individual_Props/stairs_up_01.png" id="1_xfe6d"]
+
+[node name="StairsUp01" type="Sprite2D" unique_id=853225483]
+texture_filter = 1
+texture = ExtResource("1_xfe6d")
+offset = Vector2(0, -8)

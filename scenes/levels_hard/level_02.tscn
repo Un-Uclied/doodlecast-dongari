@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/maps/hard_map.tscn" id="1_level"]
+
+[node name="HardLevel02" instance=ExtResource("1_level")]
+difficulty = 3
+level_number = 2
+mode = 2

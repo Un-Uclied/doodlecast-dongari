@@ -1,0 +1,110 @@
+[gd_scene format=3 uid="uid://bfrm7y0qis6bj"]
+
+[ext_resource type="Script" uid="uid://iedb4adc72rw" path="res://scripts/gestures/gesture_canvas.gd" id="1"]
+[ext_resource type="Resource" uid="uid://cdwsyt4bukqc0" path="res://resources/patterns/catalog.tres" id="2"]
+
+[ext_resource type="FontFile" path="res://fonts/PF스타더스트 3.0 Bold.ttf" id="3_body"]
+[ext_resource type="FontFile" path="res://fonts/Cafe24PROUP.ttf" id="4_heading"]
+[ext_resource type="PackedScene" path="res://scenes/effects/magic_sparks.tscn" id="5_sparks"]
+[ext_resource type="Theme" path="res://resources/ui/menu_theme.tres" id="6_theme"]
+
+[sub_resource type="StyleBoxFlat" id="SpellHint"]
+bg_color = Color(0.09, 0.035, 0.12, 0.88)
+border_width_left = 2
+border_color = Color(0.6, 0.39, 0.19, 0.85)
+
+[sub_resource type="CanvasItemMaterial" id="MagicGlow"]
+blend_mode = 1
+
+[node name="GestureCanvas" type="CanvasLayer" unique_id=1800892858]
+layer = 10
+
+[node name="Canvas" type="Control" parent="." unique_id=2125627589]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("6_theme")
+script = ExtResource("1")
+catalog = ExtResource("2")
+
+[node name="GlowStroke" type="Line2D" parent="Canvas"]
+texture_filter = 2
+material = SubResource("MagicGlow")
+width = 26.0
+default_color = Color(0.55, 0.2, 1, 0.15)
+joint_mode = 2
+begin_cap_mode = 2
+end_cap_mode = 2
+antialiased = true
+
+[node name="Stroke" type="Line2D" parent="Canvas"]
+texture_filter = 2
+material = SubResource("MagicGlow")
+width = 11.0
+default_color = Color(0.82, 0.55, 1, 0.8)
+joint_mode = 2
+begin_cap_mode = 2
+end_cap_mode = 2
+antialiased = true
+
+[node name="CoreStroke" type="Line2D" parent="Canvas"]
+texture_filter = 2
+material = SubResource("MagicGlow")
+width = 3.5
+default_color = Color(1, 0.9, 0.65, 1)
+joint_mode = 2
+begin_cap_mode = 2
+end_cap_mode = 2
+antialiased = true
+
+[node name="CursorParticles" parent="Canvas" instance=ExtResource("5_sparks")]
+amount = 24
+lifetime = 0.4
+initial_velocity_min = 35.0
+initial_velocity_max = 90.0
+scale_amount_min = 0.12
+scale_amount_max = 0.25
+
+[node name="Panel" type="PanelContainer" parent="Canvas" unique_id=1089519547]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 16.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("SpellHint")
+
+[node name="Margin" type="MarginContainer" parent="Canvas/Panel" unique_id=2105733838]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 10
+
+[node name="Rows" type="VBoxContainer" parent="Canvas/Panel/Margin" unique_id=1425041710]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 5
+
+[node name="Help" type="Label" parent="Canvas/Panel/Margin/Rows" unique_id=2062222437]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_body")
+theme_override_font_sizes/font_size = 15
+text = "드래그: —  |  ∧  V  별  소용돌이  ·  우클릭: 취소
+WASD 이동  ·  Shift 대시  ·  Esc 일시정지"
+
+[node name="Result" type="Label" parent="Canvas/Panel/Margin/Rows" unique_id=1065616236]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_heading")
+theme_override_font_sizes/font_size = 19
+text = "화면 어디에나 패턴을 그려 보세요."
+
+[node name="Detail" type="Label" parent="Canvas/Panel/Margin/Rows" unique_id=1433055652]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_body")
+theme_override_font_sizes/font_size = 13
+text = "반대 방향으로 그려도 같은 패턴으로 인식합니다."

@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" uid="uid://56omyeqpx1b6" path="res://image_assets/Gothic Castle Tileset/Props/Individual_Props/candle_with_holder_01.png" id="1_egsmu"]
+
+[node name="CandleWithHolder01" type="Sprite2D" unique_id=713486905]
+texture_filter = 1
+texture = ExtResource("1_egsmu")
+offset = Vector2(0, -8)

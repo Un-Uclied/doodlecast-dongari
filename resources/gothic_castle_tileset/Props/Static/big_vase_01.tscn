@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" uid="uid://dced2uuo34d5r" path="res://image_assets/Gothic Castle Tileset/Props/Individual_Props/big_vase_01.png" id="1_c3ks4"]
+
+[node name="BigVase01" type="Sprite2D" unique_id=788083566]
+texture_filter = 1
+texture = ExtResource("1_c3ks4")
+offset = Vector2(0, -8)

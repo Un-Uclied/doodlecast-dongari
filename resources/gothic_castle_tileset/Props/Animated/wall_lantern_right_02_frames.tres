@@ -1,0 +1,43 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" uid="uid://dawykvdcpcoeq" path="res://image_assets/Gothic Castle Tileset/Props/Animated_Props/wall_lantern_right_02.png" id="1_mxjc5"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sa5qb"]
+atlas = ExtResource("1_mxjc5")
+region = Rect2(0, 0, 16, 16)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_04scf"]
+atlas = ExtResource("1_mxjc5")
+region = Rect2(16, 0, 16, 16)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ryrdm"]
+atlas = ExtResource("1_mxjc5")
+region = Rect2(32, 0, 16, 16)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_t0j2g"]
+atlas = ExtResource("1_mxjc5")
+region = Rect2(48, 0, 16, 16)
+filter_clip = true
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sa5qb")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_04scf")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ryrdm")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_t0j2g")
+}],
+"loop": 1,
+"name": &"idle",
+"speed": 6.0
+}]

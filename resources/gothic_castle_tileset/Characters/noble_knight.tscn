@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://ch4bpt62f3nt4"]
+
+[ext_resource type="SpriteFrames" uid="uid://cyt3qv01yg6nf" path="res://resources/gothic_castle_tileset/Characters/noble_knight_frames.tres" id="1_ypr3b"]
+
+[node name="NobleKnight" type="AnimatedSprite2D" unique_id=1889143820]
+texture_filter = 1
+sprite_frames = ExtResource("1_ypr3b")
+animation = &"attack_south"
+autoplay = "idle_south"
+offset = Vector2(0, -8)

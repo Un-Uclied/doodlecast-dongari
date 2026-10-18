@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://6gpcumw1t7bw"
+path="res://.godot/imported/Eric Skiff - A Night Of Dizzy Spells ♫ NO COPYRIGHT 8-bit Music + Background.mp3-e61a035ab95569498d4525e843c0a3e0.mp3str"
+
+[deps]
+
+source_file="res://sounds/Eric Skiff - A Night Of Dizzy Spells ♫ NO COPYRIGHT 8-bit Music + Background.mp3"
+dest_files=["res://.godot/imported/Eric Skiff - A Night Of Dizzy Spells ♫ NO COPYRIGHT 8-bit Music + Background.mp3-e61a035ab95569498d4525e843c0a3e0.mp3str"]
+
+[params]
+
+loop=true
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

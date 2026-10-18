@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" uid="uid://dvghnt3wghpct" path="res://image_assets/Gothic Castle Tileset/Props/Individual_Props/vase_broken_01.png" id="1_qkpes"]
+
+[node name="VaseBroken01" type="Sprite2D" unique_id=1099377458]
+texture_filter = 1
+texture = ExtResource("1_qkpes")
+offset = Vector2(0, -8)

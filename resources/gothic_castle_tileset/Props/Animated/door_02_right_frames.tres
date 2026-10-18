@@ -1,0 +1,80 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" uid="uid://bvh3yje30wqrk" path="res://image_assets/Gothic Castle Tileset/Props/Animated_Props/door_02_right.png" id="1_bj1kt"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_y5w6g"]
+atlas = ExtResource("1_bj1kt")
+region = Rect2(32, 0, 16, 32)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_uri3q"]
+atlas = ExtResource("1_bj1kt")
+region = Rect2(16, 0, 16, 32)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_l332v"]
+atlas = ExtResource("1_bj1kt")
+region = Rect2(0, 0, 16, 32)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bjege"]
+atlas = ExtResource("1_bj1kt")
+region = Rect2(0, 0, 16, 32)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ucaxw"]
+atlas = ExtResource("1_bj1kt")
+region = Rect2(16, 0, 16, 32)
+filter_clip = true
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_65uub"]
+atlas = ExtResource("1_bj1kt")
+region = Rect2(32, 0, 16, 32)
+filter_clip = true
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_y5w6g")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_uri3q")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_l332v")
+}],
+"loop": 0,
+"name": &"close",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bjege")
+}],
+"loop": 0,
+"name": &"closed",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bjege")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ucaxw")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_65uub")
+}],
+"loop": 0,
+"name": &"open",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_65uub")
+}],
+"loop": 0,
+"name": &"opened",
+"speed": 5.0
+}]

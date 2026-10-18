@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" uid="uid://cw2be1mi6wehk" path="res://image_assets/Gothic Castle Tileset/Props/Individual_Props/crate_01.png" id="1_teyl4"]
+
+[node name="Crate01" type="Sprite2D" unique_id=1446888739]
+texture_filter = 1
+texture = ExtResource("1_teyl4")
+offset = Vector2(0, -8)

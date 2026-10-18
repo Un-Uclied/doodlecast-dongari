@@ -1,0 +1,10 @@
+[gd_scene format=3]
+
+[ext_resource type="SpriteFrames" path="res://resources/gothic_castle_tileset/Props/Animated/wall_lantern_right_02_frames.tres" id="1_6uiru"]
+
+[node name="WallLanternRight02" type="AnimatedSprite2D" unique_id=1773666236]
+texture_filter = 1
+sprite_frames = ExtResource("1_6uiru")
+animation = &"idle"
+autoplay = "idle"
+offset = Vector2(0, -8)

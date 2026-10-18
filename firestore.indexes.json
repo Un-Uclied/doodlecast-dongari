@@ -1,0 +1,12 @@
+{
+  "indexes": [{
+    "collectionGroup": "arena_runs",
+    "queryScope": "COLLECTION",
+    "fields": [
+      { "fieldPath": "score", "order": "DESCENDING" },
+      { "fieldPath": "hits", "order": "ASCENDING" },
+      { "fieldPath": "finished_at", "order": "ASCENDING" }
+    ]
+  }],
+  "fieldOverrides": []
+}

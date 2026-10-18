@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" uid="uid://c2vbl73x6tujh" path="res://image_assets/Gothic Castle Tileset/Props/Individual_Props/gold_stack_01.png" id="1_b2ykk"]
+
+[node name="GoldStack01" type="Sprite2D" unique_id=348034823]
+texture_filter = 1
+texture = ExtResource("1_b2ykk")
+offset = Vector2(0, -8)

@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="Texture2D" uid="uid://b3uot070jamkb" path="res://image_assets/Gothic Castle Tileset/Props/Individual_Props/barrel_01.png" id="1_e76ju"]
+
+[node name="Barrel01" type="Sprite2D" unique_id=230334623]
+texture_filter = 1
+texture = ExtResource("1_e76ju")
+offset = Vector2(0, -8)
