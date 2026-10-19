@@ -2,11 +2,12 @@ extends CharacterBody2D
 
 signal removed(enemy: Node2D, defeated: bool)
 
-enum Kind { SOLDIER, ORC, BOMB_WALKER, BAT, FLOATING_EYE }
+enum Kind { SOLDIER, ORC, BOMB_WALKER, BAT, FLOATING_EYE, FLAME_WISP }
 
-const FRAMES := [preload("res://resources/enemies/soldier_frames.tres"), preload("res://resources/enemies/orc_frames.tres"), preload("res://resources/enemies/bomb_walker_frames.tres"), preload("res://resources/enemies/bat_frames.tres"), preload("res://resources/enemies/floating_eye_frames.tres")]
+const FRAMES := [preload("res://resources/enemies/soldier_frames.tres"), preload("res://resources/enemies/orc_frames.tres"), preload("res://resources/enemies/bomb_walker_frames.tres"), preload("res://resources/enemies/bat_frames.tres"), preload("res://resources/enemies/floating_eye_frames.tres"), preload("res://resources/enemies/flame_wisp_frames.tres")]
 const CATALOG := preload("res://resources/patterns/catalog.tres")
 const PROJECTILE := preload("res://scenes/enemy_projectile.tscn")
+const FLAME_LASER := preload("res://scenes/effects/flame_laser.tscn")
 
 @export var kind: Kind = Kind.SOLDIER
 ## Special kinds always opt out of ordinary mob spacing.
@@ -25,6 +26,8 @@ var _shot_time_left := 0.0
 var _volley_angle := 0.0
 var _facing := "south"
 var _attack_time_left := 0.0
+var _laser: Area2D
+var _laser_direction := Vector2.ZERO
 
 @onready var sprite: AnimatedSprite2D = $Sprite
 
@@ -41,7 +44,7 @@ func _ready() -> void:
 		collision_layer = 0
 		collision_mask = 0
 		$CollisionShape2D.disabled = true
-	elif kind == Kind.FLOATING_EYE:
+	elif kind in [Kind.FLOATING_EYE, Kind.FLAME_WISP]:
 		speed = 65.0
 	_animate(Vector2.DOWN)
 	$Contact.body_entered.connect(_on_contact)
@@ -58,6 +61,12 @@ func _physics_process(delta: float) -> void:
 	_attack_time_left = maxf(0.0, _attack_time_left - delta)
 	if kind == Kind.BAT:
 		_orbit_player(delta)
+		return
+	if kind == Kind.FLAME_WISP and _age >= 1.0:
+		velocity = Vector2.ZERO
+		if _laser_direction == Vector2.ZERO:
+			_start_flame_laser()
+		_animate(_laser_direction)
 		return
 	if kind == Kind.FLOATING_EYE and _age >= 1.0:
 		velocity = Vector2.ZERO
@@ -119,8 +128,24 @@ func _animate(direction: Vector2) -> void:
 	var action := "walk" if kind == Kind.BOMB_WALKER and velocity != Vector2.ZERO else "idle"
 	if kind == Kind.FLOATING_EYE and _attack_time_left > 0.0:
 		action = "attack"
+	if kind == Kind.FLAME_WISP and is_instance_valid(_laser) and _laser.active:
+		action = "attack"
 	sprite.flip_h = false
 	sprite.play(action + "_" + _facing)
+
+func _start_flame_laser() -> void:
+	var offset: Vector2 = level.player.global_position - global_position
+	_laser_direction = Vector2.LEFT if offset.x < 0.0 else Vector2.RIGHT
+	if absf(offset.y) > absf(offset.x):
+		_laser_direction = Vector2.UP if offset.y < 0.0 else Vector2.DOWN
+	_laser = FLAME_LASER.instantiate()
+	_laser.caster = self
+	_laser.level = level
+	var projectiles: Node2D = level.get_node("Projectiles")
+	_laser.position = projectiles.to_local(hit_position())
+	_laser.rotation = _laser_direction.angle() - projectiles.global_rotation
+	tree_exiting.connect(_laser.stop, CONNECT_ONE_SHOT)
+	projectiles.add_child(_laser)
 
 func _fire_volley() -> void:
 	_attack_time_left = 0.67
@@ -186,6 +211,8 @@ func _on_contact(body: Node2D) -> void:
 
 func _remove(defeated: bool) -> void:
 	resolved = true
+	if is_instance_valid(_laser):
+		_laser.stop()
 	removed.emit(self, defeated)
 	queue_free()
 

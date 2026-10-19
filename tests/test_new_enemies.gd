@@ -33,7 +33,7 @@ func test_enemies() -> void:
 		assert(map.get_node("Ambient").color.v < 0.8 and map.hud is CanvasLayer)
 		map.rng.seed = 193
 		var kinds := {}
-		for index in range(5):
+		for index in range(ENEMY.Kind.size()):
 			var enemy = await map.spawn_enemy(index)
 			assert(enemy != null)
 			kinds[enemy.kind] = true
@@ -41,15 +41,15 @@ func test_enemies() -> void:
 			enemy.get_node("Contact").monitoring = false
 			if enemy.kind == ENEMY.Kind.BOMB_WALKER:
 				assert(enemy.pattern.size() == 1 and enemy.pattern[0] in map.SIMPLE_PATTERNS and enemy.reward == 100)
-			elif enemy.kind in [ENEMY.Kind.BAT, ENEMY.Kind.FLOATING_EYE]:
-				assert(enemy.pattern.size() >= map.LENGTHS[map.difficulty - 1].x, "Bat and eye use ordinary difficulty rules")
+			elif enemy.kind in [ENEMY.Kind.BAT, ENEMY.Kind.FLOATING_EYE, ENEMY.Kind.FLAME_WISP]:
+				assert(enemy.pattern.size() >= map.LENGTHS[map.difficulty - 1].x, "Bat, eye and wisp use ordinary difficulty rules")
 			if enemy.kind >= ENEMY.Kind.BOMB_WALKER:
 				assert(not enemy.maintain_spacing and enemy.sprite.material == null)
 				assert(enemy.sprite.sprite_frames.get_frame_count("idle_south") == (6 if enemy.kind == ENEMY.Kind.BAT else 8))
 			map.enemies.erase(enemy)
 			enemy.free()
 			map.spawned = 0
-		assert(kinds.size() == 5, "Normal level spawning must include all five enemy kinds")
+		assert(kinds.size() == 6, "Normal level spawning must include all six enemy kinds")
 		map.queue_free()
 		await get_tree().process_frame
 
@@ -179,5 +179,5 @@ func test_enemies() -> void:
 	await ticks(2)
 	assert(level.get_node("Projectiles").get_child_count() == 0, "Clear/game over removes every remaining bullet")
 	level.free()
-	print("PASS: all five kinds spawn in all modes, simple fast bomb, shrinking collision-free bat orbit, eye follows then anchors/fires rotating volleys, bullet damage/immunity/walls/pause/expiry/clear, automatic torch lights, fixed hit bursts, larger kill text")
+	print("PASS: all six kinds spawn in all modes, simple fast bomb, shrinking collision-free bat orbit, eye follows then anchors/fires rotating volleys, bullet damage/immunity/walls/pause/expiry/clear, automatic torch lights, fixed hit bursts, larger kill text")
 	get_tree().quit()

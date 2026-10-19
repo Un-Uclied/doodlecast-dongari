@@ -26,17 +26,22 @@ F5는 난이도 선택 메뉴에서 시작합니다. EASY/NORMAL/HARD 중 하나
 - 화면 어디든 좌클릭 드래그로 그립니다. 인식된 기호가 현재 첫 기호와 일치하는 **레벨의 모든 생존 적**에서 한 개씩 지워집니다. 플레이어와의 거리나 화면 안팎에 관계없이 적용합니다. 틀린 기호나 인식 실패는 적의 진행도를 초기화하지 않습니다. 기호를 모두 지운 적은 처치됩니다.
 - 접촉한 적은 체력을 1 깎고 사라집니다. 접촉 소멸은 점수를 주지 않습니다. 피격 후 기본 1초 동안 깜빡이며 추가 피해를 막습니다. 대시·피격 무적 중에는 체력을 잃지 않고 적도 사라지지 않습니다. 무적이 끝났을 때까지 적과 겹쳐 있다면 그때 접촉 피해가 적용됩니다.
 - 플레이어의 시작 체력은 5입니다. 0이면 게임 오버입니다. 현재 게임 맵의 구덩이는 충돌로 통과를 막으며 낙사시키지 않습니다. 길찾기는 기본 바닥뿐 아니라 `TileMapLayerPits` 등 다른 타일 레이어의 `tile_walls` 충돌도 반영하므로 적이 구덩이를 우회하고 그 위에 스폰되지 않습니다.
-- 스폰은 Soldier·Orc·Bomb Walker·Bat·Floating Eye 다섯 종류를 같은 확률로 선택합니다. 폭탄·박쥐·눈알은 일반 몹의 간격 유지에서 제외합니다. 폭탄·눈알은 다른 적에게 막히지 않고 벽·구덩이는 기존 길찾기로 우회합니다.
+- 스폰은 Soldier·Orc·Bomb Walker·Bat·Floating Eye·Flame Wisp 여섯 종류 중 선택합니다. 위스프는 EASY 1마리, NORMAL 2마리, HARD 3마리까지 동시에 등장하며, 0.2초 스폰 예고 중인 위스프도 상한에 포함합니다. 상한에 도달하면 다른 다섯 종류에서 선택합니다. 폭탄·박쥐·눈알·위스프는 일반 몹의 간격 유지에서 제외합니다. 지상 특수 적은 다른 적에게 막히지 않고 벽·구덩이는 기존 길찾기로 우회합니다.
 
 | 새 적 | 이동·공격 | 패턴 |
 | --- | --- | --- |
 | Bomb Walker | 스폰 첫 물리 프레임부터 190px/s로 추적 | DIFF와 관계없이 쉬운 기호 1개 |
 | Bat | 플레이어를 중심으로 선회하며 매초 반경을 64px씩 줄임(종전 24px). 벽·구덩이·다른 몸체를 통과 | 일반 몹과 동일 |
 | Floating Eye | 65px/s로 약 1초 추적한 뒤 그 자리에 고정. 즉시 첫 탄막, 이후 1.1초마다 각도를 바꾼 5방향 탄막 | 일반 몹과 동일 |
+| Flame Wisp | 65px/s로 1초 추적 후 정지. 플레이어 쪽 상하좌우 중 한 방향을 고정하고 0.8초간 경고한 뒤 처치될 때까지 폭 16px의 불 레이저 발사 | 일반 몹과 동일 |
 
-새 스프라이트는 원본 Pixor JSON의 액션·방향·프레임 좌표·재생 시간·피벗을 기준으로 `resources/enemies/{bomb_walker,bat,floating_eye}_frames.tres`에 연결합니다. `idle_south/east/north/west`, 폭탄의 `walk_*`, 눈알의 `attack_*`를 사용합니다. 폭탄은 실제 Walk 행으로 걷고, 별도 Walk 모션이 없는 박쥐·눈알은 방향별 Idle을 사용합니다. 눈알은 발사할 때 플레이어를 바라보며 Attack 모션을 재생합니다. Hurt 행을 대기로 사용하지 않습니다. 각 프레임의 원본 83/84ms와 발 피벗도 반영합니다.
+새 스프라이트는 원본 Pixor JSON의 액션·방향·프레임 좌표·재생 시간·피벗을 기준으로 `resources/enemies/{bomb_walker,bat,floating_eye,flame_wisp}_frames.tres`에 연결합니다. `idle_south/east/north/west`, 폭탄의 `walk_*`, 눈알·위스프의 `attack_*`를 사용합니다. 별도 Walk 모션이 없는 적은 방향별 Idle을 사용합니다. 눈알은 발사할 때 플레이어를 바라보며 Attack 모션을 재생하고, 위스프는 레이저 발사 중 고정된 방향의 Attack을 반복합니다. Hurt 행을 대기로 사용하지 않습니다. 각 프레임의 원본 83/84ms와 발 피벗도 반영합니다.
 
 눈알 탄환은 80px/s로 날아가며 벽 충돌 또는 6초 경과 시 사라집니다. `TileMapLayerPits`의 충돌 이벤트는 탄환 소멸 판정에서 제외하여 구덩이 위를 통과합니다. 구덩이의 지상 캐릭터 충돌·길찾기는 그대로 적용합니다. 플레이어 피격은 체력 1을 깎으며 기존 대시·피격 무적을 따릅니다. 일시정지 시 멈추고 클리어·게임 오버 시 전부 정리합니다. 접촉 피해와 패턴으로 적을 처치하는 규칙은 기존과 같습니다.
+
+위스프의 레이저는 발사 준비 때 벽까지의 길이를 폭 전체로 검사합니다. 중심선만 통과하는 벽 모서리도 막으며, 같은 물리 레이어의 구덩이 충돌체는 제외합니다. 경고와 피해 도형은 동일한 벽 끝점·폭·방향을 사용합니다. 연한 빨간 영역이 진한 빨간색으로 끝까지 채워진 뒤에만 공격하며, 지속해서 겹쳐 있으면 무적이 끝날 때 다시 체력 1을 깎습니다. 위스프 처치·접촉 소멸·직접 삭제·레벨 종료·씬 전환 때 경고와 레이저를 함께 정리합니다. 일시정지하면 충전·불꽃 애니메이션·피해도 멈춥니다.
+
+공용 공격 예고는 `scenes/effects/attack_telegraph.tscn`입니다. `points`에 로컬 좌표의 다각형을 넣으면 직사각형·원·부채꼴 등을 표시할 수 있습니다. `duration`은 충전 시간, `radial_fill`은 원점에서 바깥쪽으로 채우는 옵션이며 기본은 로컬 X 방향 채우기입니다. 도형을 회전해 방향을 지정합니다. 실행 중 설정을 바꾸면 `restart()`로 다시 시작하며, 완료 시 `charged` 신호를 한 번 보냅니다. 각 인스턴스의 머티리얼·진행도는 독립적입니다. 위스프 레이저의 폭·충전 시간은 `scenes/effects/flame_laser.tscn` 루트의 `Beam Width`, `Charge Duration`으로 조정합니다.
 
 모든 적은 생성 위치에 빨간 발광 파티클·조명을 0.2초 보여준 뒤 나타납니다. `scenes/effects/spawn_warning.tscn`의 `SpawnTimer.wait_time`으로 시간을 조정합니다. 대기 중에는 아직 적의 몸체·패턴 판정이 없으며, 일시정지하면 경고 시간도 멈춥니다. 스폰 자리는 미리 예약하여 경고끼리 겹치지 않고, 대기 중인 적도 남은 적 수·동시 출현 상한·클리어 판정에 반영합니다. 게임 오버 때 대기 중이던 적은 생성하지 않고, 씬을 나가면 경고와 타이머도 함께 정리합니다. 코드에서 `spawn_enemy()`를 직접 호출할 때는 `await`로 생성 완료를 기다립니다.
 
@@ -116,11 +121,13 @@ Esc 또는 HUD의 일시정지 버튼으로 게임을 멈춥니다. Esc/계속�
 
 ## 확인
 
+`Godot.exe --headless --audio-driver Dummy --path <프로젝트> res://tests/test_flame_wisp.tscn`은 세 모드의 위스프 상한·대기 중 자리 예약·처치 후 재스폰, 1초 추적 후 위치·방향 고정, 경고/피해 도형 일치, 경고 중 무피해, 구덩이 통과·벽 모서리 차단, 지속 피해·대시/피격 무적·일시정지, Attack 반복, 처치·삭제·레벨 종료 정리, 독립적인 공용 부채꼴 경고를 확인합니다. 실제 렌더러에서는 채워진 빨간색과 미충전 영역의 픽셀 차이를 검사하고 `.godot/flame-warning-preview.png`, `.godot/flame-laser-preview.png`를 저장합니다.
+
 `Godot.exe --audio-driver Dummy --path <프로젝트> res://tests/test_menu_polish.tscn`은 결과 기록·점수/시간 형식·재시작 버튼 제거·메뉴 문구·포커스·1152×648/1920×1080/960×540 배치, 일시정지 중 카드 문양 셰이더 이동, 페이드아웃→검정 화면에서 씬 교체→페이드인, 중복 버튼 방지, 나가기 확인/취소/Esc·포커스 제한·정지 상태 보존과 레벨 진행을 검사합니다. Headless에서도 실행할 수 있고 실제 렌더러에서는 `.godot/game-over-preview.png`, `.godot/pause-menu-preview.png`, `.godot/scene-fade-preview.png`, `.godot/menu-exit-confirm-preview.png`를 저장합니다.
 
 `Godot.exe --headless --audio-driver Dummy --path <프로젝트> res://tests/test_spawn_feedback.tscn`은 경고→0.2초 뒤 생성, 경고 중 정지·공격 제외·생성 위치·남은 적 수·클리어 대기·사망/씬 전환 취소, 실제 구덩이 통과·벽 충돌 탄환, 세 특수 적의 JSON 방향 행·원본 프레임 시간·피벗을 검사합니다. 실제 렌더러에서는 빨간 입자와 조명의 픽셀 변화도 확인하고 `.godot/spawn-warning-preview.png`, `.godot/enemy-directions-preview.png`를 저장합니다.
 
-`Godot.exe --headless --audio-driver Dummy --path <프로젝트> res://tests/test_new_enemies.tscn`은 세 모드의 5종 스폰, 폭탄의 단일 쉬운 패턴·즉시 추적, 박쥐의 반경 축소·선회·벽 통과, 눈알의 1초 추적 후 고정·반복 탄막, 탄환의 실제 피해·무적·벽·일시정지·수명·클리어 정리, 횃불 자동 조명, 타격 지점의 입자·원, 1.65배 처치 트윈을 확인합니다. 실제 렌더러로 실행하면 빛의 픽셀 변화도 검사하고 `.godot/new-enemies-preview.png`, `.godot/magic-hit-preview.png`를 저장합니다.
+`Godot.exe --headless --audio-driver Dummy --path <프로젝트> res://tests/test_new_enemies.tscn`은 세 모드의 6종 스폰, 폭탄의 단일 쉬운 패턴·즉시 추적, 박쥐의 반경 축소·선회·벽 통과, 눈알의 1초 추적 후 고정·반복 탄막, 탄환의 실제 피해·무적·벽·일시정지·수명·클리어 정리, 횃불 자동 조명, 타격 지점의 입자·원, 1.65배 처치 트윈을 확인합니다. 실제 렌더러로 실행하면 빛의 픽셀 변화도 검사하고 `.godot/new-enemies-preview.png`, `.godot/magic-hit-preview.png`를 저장합니다.
 
 `Godot.exe --headless --audio-driver Dummy --path <프로젝트> res://tests/test_combo.tscn`은 다섯 콤보 등급·모드 배율, 적중·처치·동시 적중·실패, 등급별 감소 속도, 동시 처치의 공통 배율, UI 위치·처치 트윈, 일시정지·결과창의 감소 정지를 확인합니다. 실제 렌더러에서는 `.godot/combo-impact-preview.png`를 저장합니다.
 

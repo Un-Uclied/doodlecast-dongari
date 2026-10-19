@@ -15,6 +15,7 @@ enum Difficulty {
 @export_enum("Easy", "Normal", "Hard") var mode: int = 1
 
 const ENEMY := preload("res://scenes/enemy.tscn")
+const ENEMY_SCRIPT := preload("res://scripts/enemy.gd")
 const LIGHTNING := preload("res://scenes/effects/lightning.tscn")
 const TORCH_LIGHT := preload("res://scenes/effects/torch_light.tscn")
 const SPAWN_WARNING := preload("res://scenes/effects/spawn_warning.tscn")
@@ -198,6 +199,19 @@ func _process(delta: float) -> void:
 func spawn_enemy(kind_override: int = -1) -> Node2D:
 	if not navigation_ready or finished or spawned >= enemy_budget():
 		return null
+	var kinds := range(ENEMY_SCRIPT.Kind.size())
+	var wisps := 0
+	for enemy in enemies:
+		if enemy.kind == ENEMY_SCRIPT.Kind.FLAME_WISP:
+			wisps += 1
+	for warning in _pending_spawns:
+		if warning.get_meta("kind") == ENEMY_SCRIPT.Kind.FLAME_WISP:
+			wisps += 1
+	if wisps >= mode + 1:
+		kinds.erase(ENEMY_SCRIPT.Kind.FLAME_WISP)
+	if kind_override >= 0 and not kind_override in kinds:
+		return null
+	var selected_kind: int = kinds[rng.randi_range(0, kinds.size() - 1)] if kind_override < 0 else kind_override
 	var candidates := PackedVector2Array()
 	for cell in walkable_cells:
 		var point := tiles.to_global(tiles.map_to_local(cell)) + Vector2(0, 3.5)
@@ -213,6 +227,7 @@ func spawn_enemy(kind_override: int = -1) -> Node2D:
 	if candidates.is_empty():
 		return null
 	var warning := SPAWN_WARNING.instantiate()
+	warning.set_meta("kind", selected_kind)
 	$Effects.add_child(warning)
 	warning.global_position = candidates[rng.randi_range(0, candidates.size() - 1)]
 	warning.get_node("Sparks").restart()
@@ -226,7 +241,7 @@ func spawn_enemy(kind_override: int = -1) -> Node2D:
 	if finished:
 		return null
 	var enemy := ENEMY.instantiate()
-	enemy.kind = rng.randi_range(0, enemy.Kind.size() - 1) if kind_override < 0 else kind_override
+	enemy.kind = selected_kind
 	if enemy.kind == enemy.Kind.BOMB_WALKER:
 		enemy.pattern.assign([SIMPLE_PATTERNS[rng.randi_range(0, SIMPLE_PATTERNS.size() - 1)]])
 	else:
