@@ -119,6 +119,18 @@ placeholder_text = "5자리 숫자 (예: 10101)"
 max_length = 5
 clear_button_enabled = true
 
+[node name="TutorialSlot" type="Control" parent="Center/Rows/PlayerInfo/Student"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Tutorial" type="Button" parent="Center/Rows/PlayerInfo/Student/TutorialSlot"]
+unique_name_in_owner = true
+layout_mode = 1
+anchor_bottom = 1.0
+offset_right = 128.0
+text = "튜토리얼"
+tooltip_text = "학번 없이 가볍게! 움직이고, 그리고, 회복해 봐요."
+
 [node name="Name" type="HBoxContainer" parent="Center/Rows/PlayerInfo" unique_id=489931492]
 layout_mode = 2
 theme_override_constants/separation = 12

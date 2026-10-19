@@ -12,12 +12,13 @@ func _ready() -> void:
 	$Center/Rows/Easy.pressed.connect(_start.bind(GameRun.Mode.EASY))
 	$Center/Rows/Normal.pressed.connect(_start.bind(GameRun.Mode.NORMAL))
 	$Center/Rows/Hard.pressed.connect(_start.bind(GameRun.Mode.HARD))
+	%Tutorial.pressed.connect(_open_tutorial)
 	student_id_input.text_changed.connect(_on_student_id_changed)
 	_on_student_id_changed(student_id_input.text)
 	student_id_input.grab_focus()
 	resized.connect(_fit_logo)
 	call_deferred("_fit_logo")
-	for button: Button in [$Center/Rows/Easy, $Center/Rows/Normal, $Center/Rows/Hard]:
+	for button: Button in [$Center/Rows/Easy, $Center/Rows/Normal, $Center/Rows/Hard, %Tutorial]:
 		button.mouse_entered.connect(func():
 			if not button.disabled:
 				button.grab_focus())
@@ -75,3 +76,7 @@ func _start(mode: int) -> void:
 	GameRun.set_player_info(student_id_input.text, name_input.text)
 	GameRun.begin_run(mode)
 	GameRun.open_level()
+
+func _open_tutorial() -> void:
+	if not SceneTransition.transitioning:
+		SceneTransition.change_scene("res://scenes/tutorial.tscn")
