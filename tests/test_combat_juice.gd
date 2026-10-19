@@ -76,7 +76,7 @@ func test_juice() -> void:
 	await get_tree().create_timer(0.45).timeout
 	assert(level.player._shake_strength == 0.0 and level.player.get_node("Camera2D").offset == Vector2.ZERO)
 	level.canvas.gesture_finished.emit({"pattern_id": &"horizontal"}, 0, 1)
-	assert(is_equal_approx(level.player._shake_strength, single_hit_shake * 2.0), "Two simultaneous matched enemies must produce twice a single hit's shake")
+	assert(is_equal_approx(level.player._shake_strength, single_hit_shake * 2.0 + level.player.KILL_SHAKE), "Two matched enemies add both hit shakes plus the killed enemy's bonus")
 	var effects := level.get_node("Effects")
 	assert(effects.get_child_count() == 2, "Every matched enemy, including a killed one, must receive a lightning strike")
 	assert(front.pattern == [&"vertical"] and rear.resolved and missed.pattern == [&"vertical"])

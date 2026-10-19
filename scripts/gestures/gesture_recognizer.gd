@@ -21,7 +21,7 @@ func _init(catalog: PatternCatalog) -> void:
 			configuration_error = "Pattern IDs must be nonempty and unique."
 			return
 		ids[pattern.id] = true
-		if not is_finite(pattern.max_error) or pattern.max_error <= 0.0 or pattern.max_error > 1.0 or pattern.samples.is_empty():
+		if not is_finite(pattern.max_error) or pattern.max_error <= 0.0 or pattern.max_error > 1.0 or pattern.samples.is_empty() or not is_finite(pattern.min_concavity) or pattern.min_concavity < 0.0 or pattern.min_concavity > 0.3:
 			configuration_error = "Invalid threshold or missing samples: %s" % pattern.id
 			return
 		var samples: Array[PackedVector2Array] = []
@@ -47,6 +47,8 @@ func recognize(points: PackedVector2Array, min_extent := 18.0) -> Dictionary:
 		var candidate: PackedVector2Array = closed_input if entry.pattern.closed else input
 		if candidate.is_empty():
 			continue
+		if entry.pattern.min_concavity > 0.0 and _concavity(candidate, entry.pattern.single_concavity) < entry.pattern.min_concavity:
+			continue
 		var error := INF
 		for sample: PackedVector2Array in entry.samples:
 			for offset in range(POINT_COUNT if entry.pattern.closed else 1):
@@ -71,6 +73,33 @@ func recognize(points: PackedVector2Array, min_extent := 18.0) -> Dictionary:
 		result.pattern_id = best.id
 		result.reason = &"recognized"
 	return result
+
+func _concavity(points: PackedVector2Array, single_concavity := false) -> float:
+	var hull := Geometry2D.convex_hull(points)
+	if hull.size() < 3:
+		return 0.0
+	if hull[-1] != hull[0]:
+		hull.append(hull[0])
+	var deepest := 0.0
+	var depths := PackedFloat32Array()
+	for point in points:
+		var nearest := INF
+		for index in range(hull.size() - 1):
+			var edge := hull[index + 1] - hull[index]
+			var t := clampf((point - hull[index]).dot(edge) / maxf(0.000001, edge.length_squared()), 0.0, 1.0)
+			nearest = minf(nearest, point.distance_to(hull[index] + edge * t))
+		deepest = maxf(deepest, nearest)
+		depths.append(nearest)
+	if single_concavity:
+		# Hearts have one notch; wide templates must not compete with five-notched stars.
+		var threshold := maxf(0.025, deepest * 0.35)
+		var regions := 0
+		for index in range(depths.size()):
+			if depths[index] > threshold and depths[(index + depths.size() - 1) % depths.size()] <= threshold:
+				regions += 1
+		if regions != 1:
+			return 0.0
+	return deepest
 
 func _distance(input: PackedVector2Array, sample: PackedVector2Array, offset: int, reverse: bool, align_rotation: bool) -> float:
 	var rotation := Transform2D.IDENTITY
@@ -108,7 +137,7 @@ func _normalize(points: PackedVector2Array, min_extent := 0.0001, closed := fals
 		return PackedVector2Array()
 	if closed:
 		var gap := clean[0].distance_to(clean[-1])
-		if clean.size() < 3 or gap > extent * 0.35:
+		if clean.size() < 3 or gap > extent * 0.45:
 			return PackedVector2Array()
 		if gap > 0.0:
 			total_length += gap

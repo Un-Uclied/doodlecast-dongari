@@ -14,7 +14,7 @@ float spade(vec2 p) {
 
 void fragment() {
 	vec2 pixels = FRAGCOORD.xy;
-	vec2 drift = (pixels + vec2(TIME * 3.0, TIME * 7.0)) / vec2(112.0, 128.0);
+	vec2 drift = (pixels + vec2(TIME * 80.0, TIME * 70.0)) / vec2(112.0, 128.0);
 	drift.x += mod(floor(drift.y), 2.0) * 0.5;
 	vec2 cell = floor(drift);
 	vec2 p = (fract(drift) - 0.5) * 1.5;

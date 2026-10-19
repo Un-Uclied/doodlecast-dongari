@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = &"star"
 display_name = "한붓그리기 별"
-samples = Array[PackedVector2Array]([PackedVector2Array(0.5, 0, 0.793893, 0.904508, 0.024472, 0.345492, 0.975528, 0.345492, 0.206107, 0.904508, 0.5, 0)])
+samples = Array[PackedVector2Array]([PackedVector2Array(0.5, 0, 0.793893, 0.904508, 0.024472, 0.345492, 0.975528, 0.345492, 0.206107, 0.904508, 0.5, 0), PackedVector2Array(0.5, 0, 0.617557, 0.338197, 0.975528, 0.345492, 0.690211, 0.561803, 0.793893, 0.904508, 0.5, 0.7, 0.206107, 0.904508, 0.309789, 0.561803, 0.024472, 0.345492, 0.382443, 0.338197, 0.5, 0)])
 closed = true
 rotation_invariant = true
-max_error = 0.14
+max_error = 0.17

@@ -71,9 +71,7 @@ func test_wisp() -> void:
 		await ticks(2)
 
 	var level = await make_level(0, true)
-	# Keep map bounds, replace wall geometry with a controlled full-width sweep fixture.
-	level.tiles.collision_enabled = false
-	level.get_node("TileMapLayerFurniture").collision_enabled = false
+	# Keep real map collisions and add an obstacle to verify the beam spans through walls.
 	var wall := make_wall(level, Vector2(96, 92), Vector2(8, 64))
 	level.player.global_position = Vector2(80, 100)
 	var wisp = await level.spawn_enemy(ENEMY.Kind.FLAME_WISP)
@@ -88,48 +86,69 @@ func test_wisp() -> void:
 	assert(wisp._laser_direction == Vector2.RIGHT and wisp.sprite.offset.y == -8.0 and not wisp.maintain_spacing)
 	assert(wisp.sprite.animation == "idle_east")
 	var warning = laser.get_node("Warning")
-	assert(warning.points == laser.get_node("Hitbox").polygon and warning.points == warning.get_node("Fill").polygon, "Warning and damage shape must use the same actual wall-clipped polygon")
-	assert(laser.global_position.x + laser.beam_length <= 92.0 and laser.global_position.x + laser.beam_length > 90.5, "The entire beam must stop just before the wall's near face")
+	assert(laser.get_node("WarningSound").playing and not laser.get_node("FireSound").playing)
+	assert(laser.get_node("FireSound").stream.loop and not load("res://sounds/fire.mp3").loop, "Loop fire locally without changing the original asset")
+	assert(warning.points == laser.get_node("Hitbox").polygon and warning.points == warning.get_node("Fill").polygon, "Warning and damage shape must span the same complete line")
+	assert(laser.beam_length == 4096.0 and warning.points[0].x == -2048.0 and warning.points[1].x == 2048.0, "The beam must extend equally far on both sides of the caster, through walls")
+	assert(laser.get_node("Sparks").position == Vector2.ZERO and laser.get_node("Sparks").emission_rect_extents.x == 2048.0)
 	level.player.global_position = laser.global_position + Vector2(24, 8)
-	await ticks(15)
+	await ticks(23)
 	assert(level.player.health == 5 and not laser.active, "Charging is harmless even inside its hitbox")
 	assert(wisp.global_position == anchor and wisp._laser_direction == Vector2.RIGHT, "After chasing, position and cardinal direction stay locked")
 	get_tree().paused = true
 	var paused_progress: float = warning.progress
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var paused_warning_audio: float = laser.get_node("WarningSound").get_playback_position()
 	await get_tree().create_timer(0.12).timeout
 	assert(warning.progress == paused_progress)
+	assert(absf(laser.get_node("WarningSound").get_playback_position() - paused_warning_audio) < 0.04, "Pause must freeze warning audio after the mixer buffer: %f -> %f" % [paused_warning_audio, laser.get_node("WarningSound").get_playback_position()])
 	await render_warning(level, laser)
 	get_tree().paused = false
 	await ticks(35)
 	assert(laser.active and not warning.visible and warning.progress == 1.0)
+	assert(not laser.get_node("WarningSound").playing and laser.get_node("FireSound").playing, "Charging audio must switch to looping fire on activation")
+	var fire: AudioStreamPlayer = laser.get_node("FireSound")
+	fire.play(maxf(0.0, fire.stream.get_length() - 0.05))
 	assert(level.player.health == 4 and wisp.sprite.animation == "attack_east", "A fully charged beam damages once and uses Attack frames")
 	assert(wisp.sprite.sprite_frames.get_animation_loop("attack_east"))
 	await ticks(12)
+	assert(fire.playing and fire.get_playback_position() < 0.5, "Fire audio must actually wrap at the end of the clip")
 	assert(level.player.health == 4, "Sustained overlap must respect hurt immunity")
+	level.player.global_position = laser.global_position + Vector2(-24, 8)
 	level.player._hurt_invulnerability_left = 0.0
 	level.player.dash_time_left = 0.3
 	await ticks(10)
 	assert(level.player.health == 4, "Dash immunity must reject continuous beam damage")
 	level.player.dash_time_left = 0.0
 	await ticks(2)
-	assert(level.player.health == 3, "Staying in the beam damages again when immunity ends")
+	assert(level.player.health == 3 and laser.overlaps_body(level.player), "The opposite side of the caster must also damage when immunity ends")
 	get_tree().paused = true
 	var paused_flame_time: float = laser._flame_time
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var paused_fire_audio := fire.get_playback_position()
 	await get_tree().create_timer(0.1).timeout
 	assert(laser._flame_time == paused_flame_time and level.player.health == 3)
+	assert(absf(fire.get_playback_position() - paused_fire_audio) < 0.04, "Pause must freeze fire audio after the mixer buffer")
 	if DisplayServer.get_name() != "headless":
 		await RenderingServer.frame_post_draw
-		assert(get_viewport().get_texture().get_image().save_png("res://.godot/flame-laser-preview.png") == OK)
+		var flame_image := get_viewport().get_texture().get_image()
+		for x in [-128, 128]:
+			var pixel := flame_image.get_pixelv(Vector2i(laser.get_global_transform_with_canvas() * Vector2(x, 0)))
+			assert(pixel.r > 0.9 and pixel.g > 0.4, "The fire shader must visibly render on both sides of the caster")
+		assert(flame_image.save_png("res://.godot/flame-laser-preview.png") == OK)
 	get_tree().paused = false
 	wisp.pattern.assign([&"horizontal"])
 	wisp.consume_pattern(&"horizontal")
 	assert(not laser.active and not laser.visible, "Killing the caster must immediately stop an active beam")
+	assert(not laser.get_node("WarningSound").playing and not laser.get_node("FireSound").playing, "Caster removal must immediately silence its warning and fire")
 	await ticks(2)
 	assert(not is_instance_valid(laser))
 	wall.queue_free()
 	await ticks(2)
 
-	# A real pit collision body must be ignored, while an off-center wall clips the full width.
+	# Real pits and off-center walls must not shorten the line in either direction.
 	var pits: TileMapLayer = level.get_node("TileMapLayerPits")
 	var original = load("res://scenes/maps/easy_map.tscn").instantiate()
 	var source_pits: TileMapLayer = original.get_node("TileMapLayerPits")
@@ -147,11 +166,20 @@ func test_wisp() -> void:
 	wisp._age = 1.0
 	await ticks(2)
 	laser = wisp._laser
-	assert(is_instance_valid(laser) and laser.beam_length <= 100.0 and laser.beam_length > 98.5, "Pit bodies must not shorten the beam; corner walls must block its full 16px width")
+	assert(is_instance_valid(laser) and laser.beam_length == 4096.0, "Pits and walls must not shorten the line")
+	await render_pit_warning(level, laser, Vector2(8, 88))
+	level.player.global_position = laser.global_position + Vector2(1000, 8)
+	level.player._hurt_invulnerability_left = 0.0
+	await ticks(50)
+	assert(laser.active and level.player.health == 2, "The line must damage far beyond walls and pits on its positive side")
+	level.player.global_position = laser.global_position + Vector2(-1000, 8)
+	level.player._hurt_invulnerability_left = 0.0
+	await ticks(2)
+	assert(level.player.health == 1, "The negative side must reach equally far behind the caster")
 	wisp.queue_free()
 	level.enemies.erase(wisp)
 	await ticks(2)
-	assert(not is_instance_valid(laser), "Direct caster deletion also removes its charging beam")
+	assert(not is_instance_valid(laser), "Direct caster deletion also removes its beam")
 	wall.queue_free()
 	pits.clear()
 	await ticks(2)
@@ -166,8 +194,12 @@ func test_wisp() -> void:
 		await ticks(2)
 		assert(wisp._laser_direction == direction and is_instance_valid(wisp._laser))
 		assert(Vector2.RIGHT.rotated(wisp._laser.global_rotation).is_equal_approx(direction))
+		var ends: PackedVector2Array = wisp._laser.get_node("Hitbox").polygon
+		assert((ends[0] + ends[2]).is_zero_approx(), "Horizontal and vertical beams must both be centered on the caster")
 		if direction != Vector2.DOWN:
+			var charging_laser = wisp._laser
 			wisp._remove(true)
+			assert(not charging_laser.get_node("WarningSound").playing, "Killing the caster during charge must silence its warning")
 			await ticks(2)
 	level.finish_level(false)
 	await ticks(2)
@@ -175,8 +207,25 @@ func test_wisp() -> void:
 	level.queue_free()
 	await ticks(2)
 	await test_sector()
-	print("PASS: wisp mode caps include pending warnings, chase/anchor/cardinal directions, matching warning/hitbox, charge-only safety, pit exclusion and full-width wall sweep, continuous damage/immunity/pause, attack animation, kill/end/unload cleanup, reusable sector and isolated materials")
+	print("PASS: wisp mode caps include pending warnings, chase/anchor/cardinal axes, matching 4096px centered warning/hitbox, charge-only safety, both sides damage through walls/pits at long range, continuous damage/immunity/pause, attack animation, kill/end/unload cleanup, reusable sector and isolated materials")
 	get_tree().quit()
+
+func render_pit_warning(level: Node2D, laser: Area2D, point: Vector2) -> void:
+	assert(level.get_node("TileMapLayerPits").z_index < laser.get_node("Warning").z_index, "Warning must sort above pit tiles")
+	if DisplayServer.get_name() == "headless":
+		return
+	get_tree().paused = true
+	level.player.get_node("Camera2D").global_position = point
+	await RenderingServer.frame_post_draw
+	var lit := get_viewport().get_texture().get_image()
+	assert(lit.save_png("res://.godot/pit-warning-preview.png") == OK)
+	laser.get_node("Warning").hide()
+	await RenderingServer.frame_post_draw
+	var background := get_viewport().get_texture().get_image()
+	var pixel := Vector2i(level.get_global_transform_with_canvas() * point)
+	assert(lit.get_pixelv(pixel).r > background.get_pixelv(pixel).r + 0.04, "Red warning must visibly render over a real pit tile")
+	laser.get_node("Warning").show()
+	get_tree().paused = false
 
 func render_warning(level: Node2D, laser: Area2D) -> void:
 	if DisplayServer.get_name() == "headless":
@@ -191,8 +240,8 @@ func render_warning(level: Node2D, laser: Area2D) -> void:
 	await RenderingServer.frame_post_draw
 	var background := get_viewport().get_texture().get_image()
 	var transform := laser.get_global_transform_with_canvas()
-	var filled: Vector2i = transform * Vector2(laser.beam_length * 0.12, -3)
-	var empty: Vector2i = transform * Vector2(laser.beam_length * 0.85, -3)
+	var filled: Vector2i = transform * Vector2(-128, -3)
+	var empty: Vector2i = transform * Vector2(128, -3)
 	assert(charged_image.get_pixelv(filled).r - background.get_pixelv(filled).r > 0.15, "Filled warning must visibly render red")
 	assert(charged_image.get_pixelv(filled).r - background.get_pixelv(filled).r > charged_image.get_pixelv(empty).r - background.get_pixelv(empty).r + 0.08, "Filled red must be stronger than the unfilled red region")
 	warning.show()

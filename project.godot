@@ -11,9 +11,15 @@ config_version=5
 [application]
 
 config/name="DOODLECAST"
-config/description="샷건으로 공주를 되찾아온다. 샷건은 그저 두 발이다. "
+config/version="1.1.0"
+config/description="DOODLECAST : 마법진을 그려 공격하고 적을 피하며 마왕성의 던전을 클리어 하세요."
 run/main_scene="res://scenes/main_menu.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
+boot_splash/show_image=false
+boot_splash/stretch_mode=0
+boot_splash/use_filter=false
+boot_splash/image="uid://cj4lhrswiind8"
+config/icon="uid://cj4lhrswiind8"
 
 [autoload]
 

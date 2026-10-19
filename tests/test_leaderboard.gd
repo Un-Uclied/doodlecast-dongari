@@ -14,6 +14,7 @@ func test_ranking() -> void:
 	GameRun.combat_score = 2500
 	GameRun.elapsed_seconds = 12.399
 	GameRun.health = 3
+	GameRun.hits_taken = 2
 	GameRun.defeated = 8
 	var record := GameRun.ranking_result(false)
 	assert(record.run_id.length() == 32 and record.participant_key == "11013".sha256_text())

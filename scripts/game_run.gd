@@ -4,7 +4,7 @@ enum Mode { EASY, NORMAL, HARD }
 
 const MODE_FOLDERS := ["easy", "normal", "hard"]
 const MODE_NAMES := ["EASY", "NORMAL", "HARD"]
-const REWARD_MULTIPLIERS := [0.75, 1.0, 1.75]
+const REWARD_MULTIPLIERS := [0.75, 1.0, 1.25]
 const SPAWN_MULTIPLIERS := [0.9, 1.0, 1.15]
 const COMBO_RANKS := ["D", "C", "B", "A", "S"]
 const COMBO_MULTIPLIERS := [1.0, 1.1, 1.2, 1.3, 1.4]
@@ -25,8 +25,13 @@ var total_score: int:
 	get:
 		return maxi(0, combat_score + time_score())
 var health := 5
+var hits_taken := 0
 var defeated := 0
 var active := false
+var debug_run := false
+var mode_name: String:
+	get:
+		return "DEBUG" if debug_run else MODE_NAMES[mode]
 var student_id := ""
 var masked_name := ""
 var run_id := ""
@@ -44,15 +49,17 @@ func set_player_info(identifier: String, full_name: String) -> void:
 		_:
 			masked_name = entered_name.left(1) + "*".repeat(entered_name.length() - 2) + entered_name.right(1)
 
-func begin_run(selected_mode: int) -> void:
+func begin_run(selected_mode: int, debug := false) -> void:
 	assert(selected_mode >= Mode.EASY and selected_mode <= Mode.HARD)
 	run_id = Crypto.new().generate_random_bytes(16).hex_encode()
 	mode = selected_mode as Mode
+	debug_run = debug
 	level_number = 1
 	combat_score = 0
 	elapsed_seconds = 0.0
 	combo_meter = 0.0
 	health = 5
+	hits_taken = 0
 	defeated = 0
 	active = true
 
@@ -64,7 +71,7 @@ func ranking_result(cleared: bool) -> Dictionary:
 		"status": "finished", "schema_version": 1,
 		"score": total_score, "combat_score": combat_score, "time_penalty": -time_score(),
 		"duration_ms": floori(elapsed_seconds * 1000.0 + 0.000001),
-		"kills": defeated, "hits": 5 - health,
+		"kills": defeated, "hits": hits_taken,
 		"character": "마법사", "difficulty": MODE_NAMES[mode],
 		"level": level_number, "cleared": int(cleared),
 	}

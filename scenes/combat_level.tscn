@@ -31,6 +31,7 @@ tile_set = ExtResource("9_tiles")
 collision_visibility_mode = 2
 
 [node name="TileMapLayerPits" type="TileMapLayer" parent="." unique_id=1283899297]
+z_index = -1
 tile_set = ExtResource("3_50ljj")
 
 [node name="Player" parent="." unique_id=1260775407 instance=ExtResource("1_player")]
@@ -41,6 +42,9 @@ tile_set = ExtResource("3_50ljj")
 y_sort_enabled = true
 
 [node name="Projectiles" type="Node2D" parent="." unique_id=132906015]
+y_sort_enabled = true
+
+[node name="Pickups" type="Node2D" parent="."]
 y_sort_enabled = true
 
 [node name="Effects" type="Node2D" parent="." unique_id=1887467546]

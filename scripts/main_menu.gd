@@ -1,5 +1,8 @@
 extends Control
 
+const KONAMI := [KEY_UP, KEY_UP, KEY_DOWN, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_LEFT, KEY_RIGHT, KEY_B, KEY_A]
+var _command: Array[int] = []
+
 @onready var student_id_input: LineEdit = %StudentId
 @onready var name_input: LineEdit = %PlayerName
 @onready var _logo_height: float = $Center/Rows/TextureRect.custom_minimum_size.y
@@ -25,6 +28,18 @@ func _fit_logo() -> void:
 	var logo: TextureRect = $Center/Rows/TextureRect
 	var other_height: float = $Center/Rows.get_combined_minimum_size().y - logo.custom_minimum_size.y
 	logo.custom_minimum_size.y = clampf(size.y - other_height - 32.0, 0.0, _logo_height)
+
+func _input(event: InputEvent) -> void:
+	if SceneTransition.transitioning or not event is InputEventKey or not event.pressed or event.echo:
+		return
+	_command.append(event.physical_keycode if event.physical_keycode != 0 else event.keycode)
+	if _command.size() > KONAMI.size():
+		_command.pop_front()
+	if _command == KONAMI:
+		get_viewport().set_input_as_handled()
+		GameRun.set_player_info(student_id_input.text, name_input.text)
+		GameRun.begin_run(GameRun.Mode.NORMAL, true)
+		GameRun.open_level()
 
 func _is_valid_student_id(text: String) -> bool:
 	if text.length() != 5:

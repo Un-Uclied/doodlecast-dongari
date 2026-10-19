@@ -11,7 +11,7 @@ shader = ExtResource("2")
 light_mode = 1
 
 [node name="AttackTelegraph" type="Node2D"]
-z_index = -1
+z_index = 0
 script = ExtResource("1")
 
 [node name="Fill" type="Polygon2D" parent="."]

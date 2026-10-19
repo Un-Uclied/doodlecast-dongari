@@ -1,0 +1,4 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://tests/test_all_clear_celebration.gd" id="1"]
+[node name="AllClearCelebrationTest" type="Node"]
+script = ExtResource("1")

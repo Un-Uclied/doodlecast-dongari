@@ -19,6 +19,8 @@ const ENEMY_SCRIPT := preload("res://scripts/enemy.gd")
 const LIGHTNING := preload("res://scenes/effects/lightning.tscn")
 const TORCH_LIGHT := preload("res://scenes/effects/torch_light.tscn")
 const SPAWN_WARNING := preload("res://scenes/effects/spawn_warning.tscn")
+const HEALING_HEART := preload("res://scenes/healing_heart.tscn")
+const HEAL_BURST := preload("res://scenes/effects/heal_burst.tscn")
 const CLOSED_DOOR_SOURCE := 2
 const OPEN_DOOR_SOURCE := 3
 const LENGTHS := [Vector2i(1, 2), Vector2i(2, 3), Vector2i(2, 4), Vector2i(3, 4), Vector2i(4, 5), Vector2i(5, 6), Vector2i(6, 7)]
@@ -33,9 +35,14 @@ var _pending_spawns: Array[Node2D] = []
 var rng := RandomNumberGenerator.new()
 var grid := AStarGrid2D.new()
 var walkable_cells: Array[Vector2i] = []
-var _spawn_time_left := 1.5
+var _spawn_time_left := 0.6
 var _starting_score := 0
 var navigation_ready := false
+var _combat_seconds := 0.0
+var _heart_delay := -1.0
+var _heart_spawned := false
+var _heart_critical := false
+var _heart: Node2D
 
 @onready var player = $Player
 @onready var tiles: TileMapLayer = $TileMapLayer
@@ -48,6 +55,11 @@ func _ready() -> void:
 	if not GameRun.active or GameRun.mode != mode:
 		GameRun.begin_run(mode)
 	GameRun.level_number = level_number
+	if mode == GameRun.Mode.HARD:
+		_spawn_time_left = 1.2
+	if GameRun.debug_run:
+		GameRun.health = player.MAX_HEALTH
+		_spawn_time_left = 0.3
 	player.health = GameRun.health
 	_starting_score = GameRun.total_score
 	rng.randomize()
@@ -69,6 +81,8 @@ func _ready() -> void:
 	canvas.result_label.text = "적 머리 위의 기호를 왼쪽부터 그리세요."
 	canvas.detail_label.text = "같은 기호의 적들을 한 번에 공격할 수 있습니다."
 	_update_hud()
+	if player.health == 1:
+		_schedule_heart(1)
 
 func _setup_lighting() -> void:
 	for layer: TileMapLayer in find_children("*", "TileMapLayer", true, false):
@@ -85,10 +99,12 @@ func _setup_lighting() -> void:
 			light.global_position = layer.to_global(flame)
 
 func enemy_budget() -> int:
-	return 12 + 2 * difficulty + level_number
+	return 1 if GameRun.debug_run else 12 + 2 * difficulty + level_number
 
 func spawn_interval() -> float:
-	return 0.85 * (4.0 - 0.4 * difficulty) * (1.0 - 0.04 * (level_number - 1)) / GameRun.SPAWN_MULTIPLIERS[mode]
+	if mode == GameRun.Mode.HARD:
+		return 2.0 - 0.1 * (level_number - 1)
+	return (1.5 - 0.08 * (difficulty - 1)) * (1.0 - 0.015 * (level_number - 1)) / GameRun.SPAWN_MULTIPLIERS[mode]
 
 func generate_pattern() -> Array[StringName]:
 	var bounds: Vector2i = LENGTHS[difficulty - 1]
@@ -186,6 +202,8 @@ func _process(delta: float) -> void:
 		return
 	var previous_time_score := GameRun.time_score()
 	GameRun.elapsed_seconds += delta
+	_combat_seconds += delta
+	_update_heart_drop(delta)
 	GameRun.decay_combo(delta)
 	hud.update_combo()
 	if GameRun.time_score() != previous_time_score:
@@ -199,6 +217,8 @@ func _process(delta: float) -> void:
 func spawn_enemy(kind_override: int = -1) -> Node2D:
 	if not navigation_ready or finished or spawned >= enemy_budget():
 		return null
+	if GameRun.debug_run:
+		kind_override = level_number - 1
 	var kinds := range(ENEMY_SCRIPT.Kind.size())
 	var wisps := 0
 	for enemy in enemies:
@@ -247,9 +267,6 @@ func spawn_enemy(kind_override: int = -1) -> Node2D:
 	else:
 		enemy.pattern = generate_pattern()
 	enemy.reward = 100 * enemy.pattern.size()
-	for symbol: StringName in enemy.pattern:
-		if symbol in HARD_PATTERNS:
-			enemy.reward += 100
 	enemy.level = self
 	enemy.position = $Enemies.to_local(point)
 	enemy.removed.connect(_on_enemy_removed)
@@ -262,10 +279,21 @@ func _on_gesture_finished(result: Dictionary, _started: int, _completed: int) ->
 	var pattern_id: StringName = result.get("pattern_id", &"")
 	if finished:
 		return
+	if pattern_id == &"heart" and is_instance_valid(_heart) and player.heal(1) > 0:
+		var burst := HEAL_BURST.instantiate()
+		burst.position = $Effects.to_local(player.global_position + Vector2(0, -12))
+		$Effects.add_child(burst)
+		_heart.queue_free()
+		_heart = null
+		hud.feedback(&"heal")
+		$MagicSuccessSound.play()
+		canvas.detail_label.text = "하트 획득 · 체력 +1"
+		return
 	if pattern_id == &"":
 		GameRun.fail_gesture()
 		hud.update_combo()
 		$MagicFailSound.play()
+		hud.feedback(&"fail")
 		canvas.result_label.modulate = Color(1, 0.6, 0.55)
 		return
 	var targets: Array[Node2D] = []
@@ -280,7 +308,7 @@ func _on_gesture_finished(result: Dictionary, _started: int, _completed: int) ->
 	for enemy in targets:
 		var impact: Vector2 = enemy.hit_position()
 		if enemy.consume_pattern(pattern_id):
-			player.shake_camera(0.8)
+			player.shake_camera(player.HIT_SHAKE)
 			var bolt := LIGHTNING.instantiate()
 			bolt.caster = player
 			bolt.target = enemy
@@ -292,6 +320,7 @@ func _on_gesture_finished(result: Dictionary, _started: int, _completed: int) ->
 	canvas.detail_label.text = "적 %d마리 적중 · %d마리 처치" % [targets.size(), kills] if not targets.is_empty() else "이 기호로 공격할 적이 없습니다."
 	if not targets.is_empty():
 		$MagicSuccessSound.play()
+	hud.feedback(&"kill" if kills > 0 else (&"hit" if not targets.is_empty() else &"cast"), kills if kills > 0 else targets.size())
 
 func _on_enemy_removed(enemy: Node2D, defeated: bool) -> void:
 	enemies.erase(enemy)
@@ -303,16 +332,77 @@ func _on_enemy_removed(enemy: Node2D, defeated: bool) -> void:
 	_update_hud()
 	if defeated:
 		hud.pulse_remaining()
+		hud.feedback(&"kill")
+		player.shake_camera(player.KILL_SHAKE)
 	if spawned == enemy_budget() and enemies.is_empty() and _pending_spawns.is_empty():
 		finish_level(true)
 
 func _on_health_changed(current: int, _maximum: int) -> void:
+	if current < GameRun.health:
+		GameRun.hits_taken += 1
+		hud.feedback(&"damage")
+		_schedule_heart(current)
 	GameRun.health = current
 	_update_hud()
 
+func _schedule_heart(health: int) -> void:
+	if GameRun.debug_run or finished or health <= 0 or _heart_spawned or _heart_critical:
+		return
+	if health == 1:
+		_heart_critical = true
+		_heart_delay = 7.0
+		return
+	if _heart_delay >= 0.0:
+		return
+	var resolved_count := spawned - enemies.size() - _pending_spawns.size()
+	if resolved_count >= enemy_budget() * 0.75:
+		return
+	var chance: float = [0.0, 1.0, 0.7, 0.45, 0.25, 0.0][health]
+	if rng.randf() < chance:
+		_heart_delay = maxf(rng.randf_range(3.0, 6.0), 8.0 - _combat_seconds)
+
+func _update_heart_drop(delta: float) -> void:
+	if _heart_delay < 0.0:
+		return
+	var resolved_count := spawned - enemies.size() - _pending_spawns.size()
+	if finished or player.is_dead or player.health == player.MAX_HEALTH or (not _heart_critical and resolved_count >= enemy_budget() * 0.75):
+		_heart_delay = -1.0
+		_heart_critical = false
+		return
+	_heart_delay = maxf(0.0, _heart_delay - delta)
+	if _heart_delay > 0.0 or not navigation_ready:
+		return
+	if not _heart_critical and (_combat_seconds < 8.0 or resolved_count < enemy_budget() * 0.2):
+		return
+	var candidates := PackedVector2Array()
+	var nearby_floor := PackedVector2Array()
+	for cell in walkable_cells:
+		var point := tiles.to_global(tiles.map_to_local(cell)) + Vector2(0, 3.5)
+		var distance := point.distance_to(player.global_position)
+		if distance < 24.0 or distance > 96.0:
+			continue
+		nearby_floor.append(point)
+		var occupied := false
+		for enemy in enemies + _pending_spawns:
+			if point.distance_to(enemy.global_position) < 20.0:
+				occupied = true
+				break
+		if not occupied:
+			candidates.append(point)
+	if candidates.is_empty() and _heart_critical:
+		candidates = nearby_floor
+	if candidates.is_empty():
+		return
+	_heart = HEALING_HEART.instantiate()
+	_heart.position = $Pickups.to_local(candidates[rng.randi_range(0, candidates.size() - 1)])
+	$Pickups.add_child(_heart)
+	_heart_spawned = true
+	_heart_delay = -1.0
+	_heart_critical = false
+
 func _update_hud() -> void:
 	hud.get_node("%Health").text = "HP  %d / 5" % player.health
-	hud.get_node("%Stage").text = "%s  %d / 6  ·  DIFF %d" % [GameRun.MODE_NAMES[mode], level_number, difficulty]
+	hud.get_node("%Stage").text = "%s  %d / 6  ·  DIFF %d" % [GameRun.mode_name, level_number, difficulty]
 	hud.get_node("%Score").text = "SCORE  %s\n경과 %s · 감점 %s점" % [hud.format_number(GameRun.total_score), hud.format_duration(GameRun.elapsed_seconds), hud.format_number(-GameRun.time_score())]
 	hud.get_node("%Remaining").text = "남은 적  %d" % (enemy_budget() - spawned + enemies.size() + _pending_spawns.size())
 	hud.update_combo()
@@ -321,6 +411,11 @@ func finish_level(cleared: bool) -> void:
 	if finished:
 		return
 	finished = true
+	_heart_delay = -1.0
+	_heart_critical = false
+	if is_instance_valid(_heart):
+		_heart.queue_free()
+		_heart = null
 	Music.ducked = true
 	get_tree().paused = false
 	hud.set_paused(false)
@@ -348,7 +443,7 @@ func finish_level(cleared: bool) -> void:
 		get_tree().create_timer(0.35, false).timeout.connect(_show_results)
 	if not cleared or final_clear:
 		GameRun.active = false
-		if GameRun.student_id.length() == 5:
+		if not GameRun.debug_run and GameRun.student_id.length() == 5:
 			Leaderboard.queue_result(GameRun.ranking_result(cleared))
 	_update_hud()
 

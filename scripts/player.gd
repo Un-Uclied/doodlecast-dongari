@@ -8,6 +8,11 @@ const DASH_SPEED := 300.0
 const DASH_DURATION := 0.36
 const DASH_COOLDOWN := 0.55
 const MAX_HEALTH := 5
+const HIT_SHAKE := 1.5
+const KILL_SHAKE := 2.4
+const HURT_SHAKE := 5.0
+const MAX_SHAKE := 10.0
+const SHAKE_DURATION := 0.34
 
 @export_range(0.0, 5.0, 0.1, "suffix:s") var hurt_invulnerability_duration := 1.0
 
@@ -63,13 +68,22 @@ func take_damage() -> bool:
 	_hurt_invulnerability_left = hurt_invulnerability_duration
 	$HurtSound.play()
 	$DamageParticles.restart()
-	shake_camera(2.8)
+	shake_camera(HURT_SHAKE)
 	health -= 1
 	health_changed.emit(health, MAX_HEALTH)
 	_damage_flash_left = 0.15
 	if health == 0:
 		_die(false)
 	return true
+
+func heal(amount: int) -> int:
+	if is_dead:
+		return 0
+	var recovered := clampi(amount, 0, MAX_HEALTH - health)
+	if recovered > 0:
+		health += recovered
+		health_changed.emit(health, MAX_HEALTH)
+	return recovered
 
 func _process(delta: float) -> void:
 	var previous_left := _shake_left
@@ -78,8 +92,8 @@ func _process(delta: float) -> void:
 	$Camera2D.offset = Vector2(randf_range(-_shake_strength, _shake_strength), randf_range(-_shake_strength, _shake_strength)) if _shake_left > 0.0 else Vector2.ZERO
 
 func shake_camera(strength: float) -> void:
-	_shake_strength += strength
-	_shake_left = 0.28
+	_shake_strength = minf(MAX_SHAKE, _shake_strength + strength)
+	_shake_left = SHAKE_DURATION
 
 func fall() -> void:
 	if not is_dead:

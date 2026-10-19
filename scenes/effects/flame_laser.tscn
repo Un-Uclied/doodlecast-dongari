@@ -5,6 +5,8 @@
 [ext_resource type="Shader" path="res://resources/effects/flame_laser.gdshader" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/effects/magic_sparks.tscn" id="4"]
 [ext_resource type="Texture2D" path="res://resources/effects/soft_particle.tres" id="5"]
+[ext_resource type="AudioStream" path="res://sounds/warning.mp3" id="6_warning"]
+[ext_resource type="AudioStream" path="res://sounds/fire.mp3" id="7_fire"]
 
 [sub_resource type="ShaderMaterial" id="Fire"]
 resource_local_to_scene = true
@@ -43,3 +45,11 @@ color = Color(1, 0.35, 0.03, 1)
 energy = 0.9
 texture = ExtResource("5")
 texture_scale = 3.0
+
+[node name="WarningSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("6_warning")
+volume_db = -12.0
+
+[node name="FireSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("7_fire")
+volume_db = -20.0

@@ -36,6 +36,7 @@ func test_enemies() -> void:
 		for index in range(ENEMY.Kind.size()):
 			var enemy = await map.spawn_enemy(index)
 			assert(enemy != null)
+			assert(enemy.reward == enemy.pattern.size() * 100, "Difficult symbols must not add extra kill points")
 			kinds[enemy.kind] = true
 			enemy.set_physics_process(false)
 			enemy.get_node("Contact").monitoring = false
@@ -72,10 +73,11 @@ func test_enemies() -> void:
 	var bat = await level.spawn_enemy(ENEMY.Kind.BAT)
 	bat.get_node("Contact").monitoring = false
 	bat.global_position = Vector2(90, 100)
+	var orbit_started: float = bat._age
 	assert(bat.collision_layer == 0 and bat.collision_mask == 0 and bat.get_node("CollisionShape2D").disabled)
 	await ticks(60)
 	var offset: Vector2 = bat.global_position - level.player.global_position
-	assert(absf(offset.length() - 26.0) < 1.0 and offset.angle() > 0.7, "Bat must orbit while reducing its actual radius by 64px per second")
+	assert(absf(offset.length() - maxf(0.0, 90.0 - 64.0 * (bat._age - orbit_started))) < 1.0 and offset.angle() > 0.7, "Bat must orbit while reducing its actual radius by 64px per simulated second")
 	bat.global_position = Vector2(8, -16)
 	level.player.global_position = Vector2(8, -80)
 	await ticks(2)

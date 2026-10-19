@@ -21,7 +21,7 @@ func ticks(count := 1) -> void:
 func test_combat() -> void:
 	for mode in range(3):
 		GameRun.begin_run(mode)
-		assert(GameRun.award(100) == [75, 100, 175][mode])
+		assert(GameRun.award(100) == [75, 100, 125][mode])
 		for number in range(1, 7):
 			GameRun.level_number = number
 			var scene := (load(GameRun.level_path()) as PackedScene).instantiate()
@@ -29,7 +29,10 @@ func test_combat() -> void:
 			assert(scene.level_number == number and scene.mode == mode)
 			assert(scene.enemy_budget() == 12 + 2 * scene.difficulty + number, "Every level must add exactly four enemies")
 			var old_interval: float = (4.0 - 0.4 * scene.difficulty) * (1.0 - 0.04 * (number - 1)) / GameRun.SPAWN_MULTIPLIERS[mode]
-			assert(is_equal_approx(scene.spawn_interval(), old_interval * 0.85), "Every spawn interval must be 15 percent shorter")
+			if mode == GameRun.Mode.HARD:
+				assert(is_equal_approx(scene.spawn_interval(), 2.0 - 0.1 * (number - 1)), "HARD must start at 2 seconds and reach 1.5 seconds gradually")
+			else:
+				assert(scene.spawn_interval() < old_interval * 0.85 and scene.spawn_interval() > 0.8 and scene.spawn_interval() < 1.7)
 			assert(scene.has_node("Player") and scene.has_node("Enemies") and scene.has_node("HUD"))
 			assert(scene.get_node("TileMapLayerFurniture").get_used_cells_by_id(LEVEL_SCRIPT.CLOSED_DOOR_SOURCE).size() == 1, "All 18 levels must inherit the edited exit door")
 			scene.free()
@@ -56,6 +59,7 @@ func test_combat() -> void:
 	var budget := rules.enemy_budget()
 	rules.level_number = 2
 	assert(rules.enemy_budget() > budget and rules.spawn_interval() < interval, "Repeated DIFF levels must still get harder")
+	assert(rules.spawn_interval() / interval > 0.98, "The per-level acceleration must be gentler than the old four percent step")
 	rules.free()
 	for kind in ["soldier", "orc"]:
 		var frames := load("res://resources/enemies/%s_frames.tres" % kind) as SpriteFrames
@@ -194,7 +198,7 @@ func test_combat() -> void:
 	level.spawned = level.enemy_budget() - 1
 	last = await level.spawn_enemy(0)
 	last.pattern.assign([&"horizontal"])
-	expected = GameRun.total_score + roundi(last.reward * 1.75) + roundi(250 * level.difficulty * 1.75)
+	expected = GameRun.total_score + roundi(last.reward * 1.25) + roundi(250 * level.difficulty * 1.25)
 	last.consume_pattern(&"horizontal")
 	await ticks(2)
 	assert(level.finished and level.hud.get_node("%ResultTitle").text == "ALL CLEAR")

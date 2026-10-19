@@ -6,7 +6,7 @@ func _initialize() -> void:
 
 func test_recognizer() -> void:
 	var catalog := load("res://resources/patterns/catalog.tres") as PatternCatalog
-	assert(catalog.patterns.size() == 6)
+	assert(catalog.patterns.size() == 7)
 	var recognizer := GestureRecognizer.new(catalog)
 	assert(recognizer.configuration_error.is_empty(), recognizer.configuration_error)
 	for pattern in catalog.patterns:
@@ -37,7 +37,7 @@ func test_recognizer() -> void:
 		assert(recognizer.recognize(stroke).pattern_id == &"", "Unregistered shape must be rejected")
 	var star := load("res://resources/patterns/star.tres") as PatternDefinition
 	var pentagram := star.samples[0]
-	assert(star.samples.size() == 1 and pentagram.size() == 6 and pentagram[0] == pentagram[-1], "The icon and recognizer must share a closed five-line pentagram")
+	assert(star.samples.size() == 2 and pentagram.size() == 6 and pentagram[0] == pentagram[-1], "Keep the pentagram icon while also accepting outlined stars")
 	var crossings := 0
 	for first in range(pentagram.size() - 1):
 		for second in range(first + 2, pentagram.size() - 1):
@@ -49,9 +49,9 @@ func test_recognizer() -> void:
 	var outline := PackedVector2Array()
 	for point in PackedVector2Array([Vector2(0.5, 0), Vector2(0.617557, 0.338197), Vector2(0.975528, 0.345492), Vector2(0.690211, 0.561803), Vector2(0.793893, 0.904508), Vector2(0.5, 0.7), Vector2(0.206107, 0.904508), Vector2(0.309789, 0.561803), Vector2(0.024472, 0.345492), Vector2(0.382443, 0.338197), Vector2(0.5, 0)]):
 		outline.append(point * 150.0 + Vector2(300, 180))
-	assert(recognizer.recognize(outline).pattern_id == &"", "The previous hollow outline must no longer cast a star spell")
+	assert(recognizer.recognize(outline).pattern_id == &"star", "Outlined stars must also cast a star spell")
 	outline.reverse()
-	assert(recognizer.recognize(outline).pattern_id == &"", "The reversed hollow outline must also be rejected")
+	assert(recognizer.recognize(outline).pattern_id == &"star", "Outlined stars must allow reversed strokes")
 	for sample in star.samples:
 		for start in range(sample.size() - 1):
 			var stroke := PackedVector2Array()
@@ -86,5 +86,8 @@ func test_recognizer() -> void:
 	var invalid_recognizer := GestureRecognizer.new(duplicate_ids)
 	assert(not invalid_recognizer.configuration_error.is_empty())
 	assert(invalid_recognizer.recognize(PackedVector2Array([Vector2.ZERO, Vector2(150, 0)])).pattern_id == &"")
-	print("PASS: six gestures, reverse strokes, translation/scale, uneven sampling/noise, pentagram icon and recognition, hollow star rejection, star start positions/rotation, spiral winding/rotation, invalid inputs, unknown shapes, catalog validation")
+	var invalid_concavity := catalog.duplicate(true) as PatternCatalog
+	invalid_concavity.patterns[-1].min_concavity = NAN
+	assert(not GestureRecognizer.new(invalid_concavity).configuration_error.is_empty())
+	print("PASS: seven gestures, reverse strokes, translation/scale, uneven sampling/noise, pentagram and outlined stars, star start positions/rotation, spiral winding/rotation, heart, invalid inputs, unknown shapes, catalog validation")
 	quit()
