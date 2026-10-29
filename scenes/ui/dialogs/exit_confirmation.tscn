@@ -1,0 +1,79 @@
+[gd_scene format=3 uid="uid://r7ewi7rohlog"]
+
+[ext_resource type="FontFile" uid="uid://cpo53il2jcgk" path="res://fonts/Cafe24PROUP.ttf" id="2_heading"]
+[ext_resource type="Theme" uid="uid://di013qfonntde" path="res://resources/ui/menu_theme.tres" id="5_theme"]
+[ext_resource type="Script" uid="uid://dghx0r5r8ddpn" path="res://scripts/ui/arcane_frame.gd" id="6_frame"]
+[ext_resource type="Script" uid="uid://ceg0ext56fesq" path="res://scripts/ui/dialogs/exit_confirmation.gd" id="dialog_exit_controller"]
+[ext_resource type="StyleBox" path="res://resources/ui/styles/menu_card.tres" id="ui_card"]
+
+[node name="MenuConfirmation" type="ColorRect" unique_id=1555462104]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("5_theme")
+color = Color(0.025, 0.01, 0.035, 0.8)
+script = ExtResource("dialog_exit_controller")
+
+[node name="Center" type="CenterContainer" parent="." unique_id=422084016]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Card" type="PanelContainer" parent="Center" unique_id=1544418726]
+custom_minimum_size = Vector2(460, 0)
+layout_mode = 2
+theme_override_styles/panel = ExtResource("ui_card")
+script = ExtResource("6_frame")
+
+[node name="Rows" type="VBoxContainer" parent="Center/Card" unique_id=1975251036]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Title" type="Label" parent="Center/Card/Rows" unique_id=264518227]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.48, 1)
+theme_override_fonts/font = ExtResource("2_heading")
+theme_override_font_sizes/font_size = 26
+text = "메인 메뉴로 돌아갈까요?"
+horizontal_alignment = 1
+
+[node name="Hint" type="Label" parent="Center/Card/Rows" unique_id=1976263013]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "현재 게임을 종료하고 메인 메뉴로 이동합니다."
+horizontal_alignment = 1
+
+[node name="Actions" type="HBoxContainer" parent="Center/Card/Rows" unique_id=1549755493]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ExitCancel" type="Button" parent="Center/Card/Rows/Actions" unique_id=630281731]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_neighbor_left = NodePath("../ExitConfirm")
+focus_neighbor_top = NodePath("../ExitConfirm")
+focus_neighbor_right = NodePath("../ExitConfirm")
+focus_neighbor_bottom = NodePath("../ExitConfirm")
+focus_next = NodePath("../ExitConfirm")
+focus_previous = NodePath("../ExitConfirm")
+text = "취소"
+
+[node name="ExitConfirm" type="Button" parent="Center/Card/Rows/Actions" unique_id=1036062996]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+size_flags_horizontal = 3
+focus_neighbor_left = NodePath("../ExitCancel")
+focus_neighbor_top = NodePath("../ExitCancel")
+focus_neighbor_right = NodePath("../ExitCancel")
+focus_neighbor_bottom = NodePath("../ExitCancel")
+focus_next = NodePath("../ExitCancel")
+focus_previous = NodePath("../ExitCancel")
+text = "나가기"

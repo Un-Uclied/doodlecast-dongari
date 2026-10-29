@@ -34,11 +34,11 @@ function render(records=[]) {
 function renderBooths(booths) {
   const target=$('booth-list');target.replaceChildren();
   if(!booths.length){
-    const card=el('div','coming-soon');card.append(el('h3','','부스 라인업 준비 중'),el('p','','게임 이름과 소개가 정해지면\n이곳에서 안내할게요.'));target.append(card);return;
+    target.append(el('p','','현장에서 더 많은 동아리 게임을 만나보세요.'));return;
   }
   booths.forEach((b,i)=>{
     const card=el('article','booth-card'), team=el('div','team',b.team || '동아리 부스');team.append(el('span','',String(i+1).padStart(2,'0')));
-    card.append(team,el('h3','',b.name || '게임 이름 준비 중'),el('p','',b.description || '게임 소개를 준비하고 있어요.'));
+    card.append(team,el('h3','',b.name || '동아리 게임'),el('p','',b.description || '현장에서 직접 만나보세요.'));
     if(b.location)card.append(el('span','location',b.location));target.append(card);
   });
 }

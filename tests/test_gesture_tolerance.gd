@@ -18,6 +18,13 @@ func rough_stroke(vertices: PackedVector2Array, aspect: Vector2, angle: float) -
 func test_tolerance() -> void:
 	var catalog := load("res://resources/patterns/catalog.tres") as PatternCatalog
 	var recognizer := GestureRecognizer.new(catalog)
+	for id in [&"horizontal", &"vertical"]:
+		var vertices := PackedVector2Array([Vector2.ZERO, Vector2.RIGHT if id == &"horizontal" else Vector2.DOWN])
+		for angle in [-0.52, -0.3, 0.3, 0.52]:
+			var tilted := rough_stroke(vertices, Vector2.ONE, angle)
+			assert(recognizer.recognize(tilted).pattern_id == id, "Tilted, noisy lines must keep their dominant axis")
+			tilted.reverse()
+			assert(recognizer.recognize(tilted).pattern_id == id)
 	var checks: Array[PackedVector2Array] = [
 		PackedVector2Array([Vector2(0, 0.45), Vector2(0.22, 0.75), Vector2(1, 0)]),
 		PackedVector2Array([Vector2(0, 0.35), Vector2(0.18, 0.62), Vector2(1, 0)]),
@@ -52,9 +59,6 @@ func test_tolerance() -> void:
 	incomplete.resize(5)
 	var unknowns: Array[PackedVector2Array] = [
 		incomplete,
-		PackedVector2Array([Vector2(0, 0), Vector2(0.5, 1), Vector2(1, 0), Vector2(0, 0)]),
-		PackedVector2Array([Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(0, 1), Vector2(0, 0)]),
-		PackedVector2Array([Vector2(0, 0), Vector2(1, 1)]),
 		PackedVector2Array([Vector2(0, 0), Vector2(0.3, 1), Vector2(0.6, 0), Vector2(1, 1)]),
 		PackedVector2Array([Vector2(0, 0), Vector2(1, 0), Vector2(0, 0), Vector2(1, 0)])
 	]
@@ -66,5 +70,6 @@ func test_tolerance() -> void:
 		for angle in [0.0, 0.25]:
 			var result := recognizer.recognize(rough_stroke(vertices, Vector2.ONE, angle))
 			assert(result.pattern_id == &"", "Unrelated or incomplete shapes must remain rejected: %s" % result)
-	print("PASS: 96 noisy/mirrored/reversed checks; 288 rotated, skewed, wobbly, unfinished/overshot stars; incomplete stars, circles, polygons, diagonals and scribbles rejected")
+	assert(recognizer.recognize(PackedVector2Array([Vector2(0, 0), Vector2(100, 100)])).pattern_id == &"", "An exactly diagonal line has no dominant axis")
+	print("PASS: 96 noisy/mirrored/reversed checks; 288 rotated, skewed, wobbly, unfinished/overshot stars; incomplete stars, circles, diagonals and scribbles rejected")
 	quit()

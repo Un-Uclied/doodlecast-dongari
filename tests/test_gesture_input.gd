@@ -40,7 +40,7 @@ func key(code: Key, pressed: bool) -> void:
 
 func test_input() -> void:
 	var original_accumulation := Input.use_accumulated_input
-	var map := (load("res://scenes/test_scene.tscn") as PackedScene).instantiate()
+	var map := (load("res://scenes/sandbox/test_scene.tscn") as PackedScene).instantiate()
 	root.add_child(map)
 	await ticks(2)
 	var canvas = map.get_node("GestureCanvas/Canvas")
@@ -141,5 +141,6 @@ func test_input() -> void:
 	mouse_button(Vector2(200, 450), false)
 	assert(_results.size() == 6)
 	map.free()
+	await create_timer(0.1).timeout
 	print("PASS: mouse input, checks and tilted/unfinished stars, one result per stroke, concurrent movement/dash, UI blocking, cancel/focus/pause/death cleanup, input-setting restoration, configurable minimum size")
 	quit()

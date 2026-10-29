@@ -1,4 +1,4 @@
-extends "res://scripts/leaderboard.gd"
+extends "res://scripts/autoload/leaderboard.gd"
 
 var responses: Array = []
 var requests: Array = []

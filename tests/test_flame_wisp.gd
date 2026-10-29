@@ -1,6 +1,6 @@
 extends Node
 
-const ENEMY := preload("res://scripts/enemy.gd")
+const ENEMY := preload("res://scripts/gameplay/enemy.gd")
 const WARNING := preload("res://scenes/effects/attack_telegraph.tscn")
 var completed: Array = []
 
@@ -208,6 +208,8 @@ func test_wisp() -> void:
 	await ticks(2)
 	await test_sector()
 	print("PASS: wisp mode caps include pending warnings, chase/anchor/cardinal axes, matching 4096px centered warning/hitbox, charge-only safety, both sides damage through walls/pits at long range, continuous damage/immunity/pause, attack animation, kill/end/unload cleanup, reusable sector and isolated materials")
+	Music.stop()
+	await get_tree().create_timer(0.2).timeout
 	get_tree().quit()
 
 func render_pit_warning(level: Node2D, laser: Area2D, point: Vector2) -> void:
@@ -240,15 +242,13 @@ func render_warning(level: Node2D, laser: Area2D) -> void:
 	await RenderingServer.frame_post_draw
 	var background := get_viewport().get_texture().get_image()
 	var transform := laser.get_global_transform_with_canvas()
-	var filled: Vector2i = transform * Vector2(-128, -3)
-	var empty: Vector2i = transform * Vector2(128, -3)
-	assert(charged_image.get_pixelv(filled).r - background.get_pixelv(filled).r > 0.15, "Filled warning must visibly render red")
-	assert(charged_image.get_pixelv(filled).r - background.get_pixelv(filled).r > charged_image.get_pixelv(empty).r - background.get_pixelv(empty).r + 0.08, "Filled red must be stronger than the unfilled red region")
+	for x in [-128, 128]:
+		var filled: Vector2i = transform * Vector2(x, -3)
+		assert(charged_image.get_pixelv(filled).r - background.get_pixelv(filled).r > 0.15, "Centered charge must visibly fill both sides of the caster")
 	warning.show()
 
 func test_sector() -> void:
 	var sector = WARNING.instantiate()
-	sector.radial_fill = true
 	sector.points = PackedVector2Array([Vector2.ZERO])
 	for index in range(25):
 		sector.points.append(Vector2.from_angle(-PI / 3.0 + index * PI / 36.0) * 64.0)
@@ -259,7 +259,7 @@ func test_sector() -> void:
 	assert(sector.get_node("Fill").polygon == sector.points)
 	assert(sector.get_node("Outline").points.size() == sector.points.size() + 1)
 	assert(sector.get_node("Fill").material != other.get_node("Fill").material)
-	assert(sector.get_node("Fill").material.get_shader_parameter("radial_fill") == true)
+	assert(sector.get_node("Fill").material.get_shader_parameter("fill_radius") > 0)
 	var charges := [0]
 	sector.charged.connect(func(): charges[0] += 1)
 	await ticks(10)

@@ -11,7 +11,7 @@ func test_maps() -> void:
 	for mode in range(MODES.size()):
 		var path := "res://scenes/maps/%s_map.tscn" % MODES[mode]
 		var packed := load(path) as PackedScene
-		assert(packed.get_state().get_base_scene_state().get_path() == "res://scenes/combat_level.tscn")
+		assert(packed.get_state().get_base_scene_state().get_path() == "res://scenes/gameplay/combat_level.tscn")
 		var map := packed.instantiate() as Node2D
 		assert(map.mode == mode, "F6 on a map must use its own mode")
 		maps.append(map)

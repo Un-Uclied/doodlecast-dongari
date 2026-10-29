@@ -1,0 +1,347 @@
+[gd_scene format=3]
+
+[ext_resource type="FontFile" uid="uid://cpo53il2jcgk" path="res://fonts/Cafe24PROUP.ttf" id="2_heading"]
+[ext_resource type="Material" uid="uid://bae8wp82onac1" path="res://resources/ui/backgrounds/menu_background.tres" id="4_background"]
+[ext_resource type="Theme" uid="uid://di013qfonntde" path="res://resources/ui/menu_theme.tres" id="5_theme"]
+[ext_resource type="Script" uid="uid://dghx0r5r8ddpn" path="res://scripts/ui/arcane_frame.gd" id="6_frame"]
+[ext_resource type="AudioStream" uid="uid://cggkpj0na78l" path="res://sounds/yay.mp3" id="8_yay"]
+[ext_resource type="Texture2D" uid="uid://c37pdbo0gxcqg" path="res://image_assets/Vignette_(SuperTux).png" id="9_c4dla"]
+[ext_resource type="Texture2D" uid="uid://dfim77cdbxixn" path="res://image_assets/마법 지팡이를 든 승리의 픽셀 소년.png" id="9_victory"]
+
+[ext_resource type="StyleBoxFlat" path="res://resources/ui/styles/menu_card.tres" id="ui_card"]
+
+[ext_resource type="StyleBoxFlat" path="res://resources/ui/styles/result_stats.tres" id="ui_stats"]
+
+[ext_resource type="Script" path="res://scripts/ui/screens/results_screen.gd" id="screen_results_controller"]
+
+[sub_resource type="CanvasItemMaterial" id="ConfettiUnshaded"]
+light_mode = 1
+
+[sub_resource type="Gradient" id="ConfettiWhite"]
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="ConfettiTexture"]
+gradient = SubResource("ConfettiWhite")
+width = 4
+height = 8
+
+[sub_resource type="Gradient" id="ConfettiFade"]
+offsets = PackedFloat32Array(0, 0.75, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="Gradient" id="ConfettiColors"]
+offsets = PackedFloat32Array(0, 0.33, 0.66, 1)
+colors = PackedColorArray(1, 0.82, 0.24, 1, 0.72, 0.4, 1, 1, 1, 0.35, 0.55, 1, 1, 0.95, 0.7, 1)
+
+[node name="Results" type="ColorRect" unique_id=1203096231]
+material = ExtResource("4_background")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("5_theme")
+script = ExtResource("screen_results_controller")
+
+[node name="VictoryArt" type="TextureRect" parent="." unique_id=167725316]
+unique_name_in_owner = true
+modulate = Color(0.85490197, 0.81960785, 0.85490197, 1)
+texture_filter = 1
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = 789.0
+offset_top = -78.0
+offset_right = 473.0
+offset_bottom = -190.0
+scale = Vector2(1.765, 1.765)
+mouse_filter = 2
+texture = ExtResource("9_victory")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=1686801155]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="Scroll" type="ScrollContainer" parent="Margin" unique_id=605338888]
+layout_mode = 2
+follow_focus = true
+horizontal_scroll_mode = 0
+
+[node name="Center" type="CenterContainer" parent="Margin/Scroll" unique_id=1905269467]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Card" type="PanelContainer" parent="Margin/Scroll/Center" unique_id=1022875724]
+custom_minimum_size = Vector2(560, 0)
+layout_mode = 2
+theme_override_styles/panel = ExtResource("ui_card")
+script = ExtResource("6_frame")
+
+[node name="Rows" type="VBoxContainer" parent="Margin/Scroll/Center/Card" unique_id=573549367]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ResultTitle" type="Label" parent="Margin/Scroll/Center/Card/Rows" unique_id=963947621]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_heading")
+theme_override_font_sizes/font_size = 36
+text = "GAME OVER"
+horizontal_alignment = 1
+
+[node name="ClearMessage" type="Label" parent="Margin/Scroll/Center/Card/Rows" unique_id=1216332764]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.88, 0.45, 1)
+theme_override_font_sizes/font_size = 18
+text = "마왕성 던전을 클리어 했습니다!"
+horizontal_alignment = 1
+
+[node name="ResultStage" type="Label" parent="Margin/Scroll/Center/Card/Rows" unique_id=868106845]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.62, 0.77, 1)
+theme_override_font_sizes/font_size = 16
+text = "NORMAL  ·  레벨 1 / 6"
+horizontal_alignment = 1
+
+[node name="ResultIdentity" type="Label" parent="Margin/Scroll/Center/Card/Rows" unique_id=2005708857]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.62, 0.77, 1)
+theme_override_font_sizes/font_size = 16
+text = "학번 10101"
+horizontal_alignment = 1
+
+[node name="Total" type="VBoxContainer" parent="Margin/Scroll/Center/Card/Rows" unique_id=1249708225]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Caption" type="Label" parent="Margin/Scroll/Center/Card/Rows/Total" unique_id=283626863]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.74, 0.56, 1)
+theme_override_font_sizes/font_size = 14
+text = "총합 점수"
+horizontal_alignment = 1
+
+[node name="ResultTotal" type="Label" parent="Margin/Scroll/Center/Card/Rows/Total" unique_id=1251882976]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.4, 1)
+theme_override_fonts/font = ExtResource("2_heading")
+theme_override_font_sizes/font_size = 48
+text = "19862"
+horizontal_alignment = 1
+
+[node name="Stats" type="PanelContainer" parent="Margin/Scroll/Center/Card/Rows" unique_id=34402780]
+layout_mode = 2
+theme_override_styles/panel = ExtResource("ui_stats")
+
+[node name="Grid" type="GridContainer" parent="Margin/Scroll/Center/Card/Rows/Stats" unique_id=1711287309]
+layout_mode = 2
+theme_override_constants/h_separation = 32
+theme_override_constants/v_separation = 5
+columns = 2
+
+[node name="LevelScoreCaption" type="Label" parent="Margin/Scroll/Center/Card/Rows/Stats/Grid" unique_id=388600056]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.73, 0.6, 0.75, 1)
+theme_override_font_sizes/font_size = 16
+text = "이번 레벨"
+
+[node name="ResultLevelScore" type="Label" parent="Margin/Scroll/Center/Card/Rows/Stats/Grid" unique_id=619937075]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.97, 0.89, 0.72, 1)
+theme_override_font_sizes/font_size = 16
+text = "+2159점"
+horizontal_alignment = 2
+
+[node name="CombatScoreCaption" type="Label" parent="Margin/Scroll/Center/Card/Rows/Stats/Grid" unique_id=696218382]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.73, 0.6, 0.75, 1)
+theme_override_font_sizes/font_size = 16
+text = "처치·클리어 점수"
+
+[node name="ResultCombatScore" type="Label" parent="Margin/Scroll/Center/Card/Rows/Stats/Grid" unique_id=932581063]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.97, 0.89, 0.72, 1)
+theme_override_font_sizes/font_size = 16
+text = "21525점"
+horizontal_alignment = 2
+
+[node name="ElapsedCaption" type="Label" parent="Margin/Scroll/Center/Card/Rows/Stats/Grid" unique_id=1938668829]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.73, 0.6, 0.75, 1)
+theme_override_font_sizes/font_size = 16
+text = "경과 시간"
+
+[node name="ResultElapsed" type="Label" parent="Margin/Scroll/Center/Card/Rows/Stats/Grid" unique_id=1718840087]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.97, 0.89, 0.72, 1)
+theme_override_font_sizes/font_size = 16
+text = "166.3초"
+horizontal_alignment = 2
+
+[node name="PenaltyCaption" type="Label" parent="Margin/Scroll/Center/Card/Rows/Stats/Grid" unique_id=473473695]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.73, 0.6, 0.75, 1)
+theme_override_font_sizes/font_size = 16
+text = "시간 감점"
+
+[node name="ResultPenalty" type="Label" parent="Margin/Scroll/Center/Card/Rows/Stats/Grid" unique_id=281193400]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 16
+text = "-1663점"
+horizontal_alignment = 2
+
+[node name="KillsCaption" type="Label" parent="Margin/Scroll/Center/Card/Rows/Stats/Grid" unique_id=1166726017]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.73, 0.6, 0.75, 1)
+theme_override_font_sizes/font_size = 16
+text = "누적 처치"
+
+[node name="ResultKills" type="Label" parent="Margin/Scroll/Center/Card/Rows/Stats/Grid" unique_id=467789563]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.97, 0.89, 0.72, 1)
+theme_override_font_sizes/font_size = 16
+text = "62마리"
+horizontal_alignment = 2
+
+[node name="HealthCaption" type="Label" parent="Margin/Scroll/Center/Card/Rows/Stats/Grid" unique_id=661153847]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.73, 0.6, 0.75, 1)
+theme_override_font_sizes/font_size = 16
+text = "남은 체력"
+
+[node name="ResultHealth" type="Label" parent="Margin/Scroll/Center/Card/Rows/Stats/Grid" unique_id=1677212064]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.97, 0.89, 0.72, 1)
+theme_override_font_sizes/font_size = 16
+text = "0 / 5"
+horizontal_alignment = 2
+
+[node name="ModeMultiplierCaption" type="Label" parent="Margin/Scroll/Center/Card/Rows/Stats/Grid" unique_id=489561788]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.73, 0.6, 0.75, 1)
+theme_override_font_sizes/font_size = 16
+text = "난이도 배율"
+
+[node name="ResultModeMultiplier" type="Label" parent="Margin/Scroll/Center/Card/Rows/Stats/Grid" unique_id=176042628]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.97, 0.89, 0.72, 1)
+theme_override_font_sizes/font_size = 16
+text = "×1.00"
+horizontal_alignment = 2
+
+[node name="ComboMultiplierCaption" type="Label" parent="Margin/Scroll/Center/Card/Rows/Stats/Grid" unique_id=1838440680]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.73, 0.6, 0.75, 1)
+theme_override_font_sizes/font_size = 16
+text = "콤보 배율"
+
+[node name="ResultComboMultiplier" type="Label" parent="Margin/Scroll/Center/Card/Rows/Stats/Grid" unique_id=1795281982]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.97, 0.89, 0.72, 1)
+theme_override_font_sizes/font_size = 16
+text = "D  ×1.0"
+horizontal_alignment = 2
+
+[node name="RankingStatus" type="Label" parent="Margin/Scroll/Center/Card/Rows" unique_id=1195171049]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.73, 0.6, 0.75, 1)
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 1
+
+[node name="Actions" type="HBoxContainer" parent="Margin/Scroll/Center/Card/Rows" unique_id=1725101657]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Continue" type="Button" parent="Margin/Scroll/Center/Card/Rows/Actions" unique_id=371840601]
+unique_name_in_owner = true
+visible = false
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "다음 레벨"
+
+[node name="Menu" type="Button" parent="Margin/Scroll/Center/Card/Rows/Actions" unique_id=1570693017]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "메인 메뉴로"
+
+[node name="Confetti" type="CPUParticles2D" parent="." unique_id=1350174251]
+unique_name_in_owner = true
+material = SubResource("ConfettiUnshaded")
+emitting = false
+amount = 200
+texture = SubResource("ConfettiTexture")
+lifetime = 3.2
+one_shot = true
+explosiveness = 0.45
+randomness = 0.3
+emission_shape = 3
+emission_rect_extents = Vector2(576, 1)
+direction = Vector2(0, 1)
+spread = 50.0
+gravity = Vector2(0, 70)
+initial_velocity_min = 90.0
+initial_velocity_max = 180.0
+angular_velocity_min = 90.0
+angular_velocity_max = 240.0
+scale_amount_min = 0.65
+scale_amount_max = 1.3
+color_ramp = SubResource("ConfettiFade")
+color_initial_ramp = SubResource("ConfettiColors")
+
+[node name="TextureRect2" type="TextureRect" parent="." unique_id=1574027017]
+visible = false
+modulate = Color(0.07058824, 0.023529412, 0.101960786, 0.21176471)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("9_c4dla")
+expand_mode = 1
+flip_h = true
+
+[node name="YaySound" type="AudioStreamPlayer" parent="." unique_id=1025907524]
+unique_name_in_owner = true
+stream = ExtResource("8_yay")
+volume_db = -8.0

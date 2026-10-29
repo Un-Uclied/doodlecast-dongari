@@ -1,0 +1,78 @@
+[gd_scene format=3 uid="uid://c51pu4xrjqmvt"]
+
+[ext_resource type="PackedScene" uid="uid://0v36faeoi2ak" path="res://scenes/gameplay/player.tscn" id="1_player"]
+[ext_resource type="Script" uid="uid://cfamank5qp5ds" path="res://scripts/gameplay/level.gd" id="2_level"]
+[ext_resource type="TileSet" uid="uid://b8w3hhuc3cohc" path="res://resources/gothic_castle_tileset/TileSets/castle_tileset.tres" id="3_50ljj"]
+[ext_resource type="PackedScene" uid="uid://bcf2wadlkpunp" path="res://scenes/ui/combat_hud.tscn" id="3_hud"]
+[ext_resource type="AudioStream" uid="uid://bm426auev1v5f" path="res://sounds/magic_success.wav" id="4_magic_success"]
+[ext_resource type="AudioStream" uid="uid://c7rfjplsnhc1p" path="res://sounds/magic_fail.wav" id="5_magic_fail"]
+[ext_resource type="AudioStream" uid="uid://cx3c43k1hmj6s" path="res://sounds/level_clear.wav" id="6_level_clear"]
+[ext_resource type="AudioStream" uid="uid://cgj4e7mcm1ukb" path="res://sounds/metal_door_open.wav" id="7_door_open"]
+[ext_resource type="PackedScene" uid="uid://bfrm7y0qis6bj" path="res://scenes/gestures/gesture_canvas.tscn" id="8_gestures"]
+[ext_resource type="TileSet" uid="uid://ca0agc4wwpw6j" path="res://resources/Dungeon/TileSets/dungeon_tileset.tres" id="9_tiles"]
+[ext_resource type="AudioStream" path="res://sounds/laser.wav" id="10_laser"]
+
+[node name="CombatLevel" type="Node2D" unique_id=932307737]
+y_sort_enabled = true
+script = ExtResource("2_level")
+
+[node name="Ambient" type="CanvasModulate" parent="."]
+color = Color(0.74, 0.67, 0.75, 1)
+
+[node name="Lighting" type="Node2D" parent="."]
+
+[node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=751367042]
+z_index = -1
+tile_set = ExtResource("9_tiles")
+collision_visibility_mode = 2
+
+[node name="TileMapLayerFurniture" type="TileMapLayer" parent="." unique_id=1968085749]
+z_index = -1
+tile_set = ExtResource("9_tiles")
+collision_visibility_mode = 2
+
+[node name="TileMapLayerPits" type="TileMapLayer" parent="." unique_id=1283899297]
+z_index = -1
+tile_set = ExtResource("3_50ljj")
+
+[node name="Player" parent="." unique_id=1260775407 instance=ExtResource("1_player")]
+
+[node name="GestureCanvas" parent="." unique_id=1524785396 instance=ExtResource("8_gestures")]
+
+[node name="Enemies" type="Node2D" parent="." unique_id=785556615]
+y_sort_enabled = true
+
+[node name="Projectiles" type="Node2D" parent="." unique_id=132906015]
+y_sort_enabled = true
+
+[node name="Pickups" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="Effects" type="Node2D" parent="." unique_id=1887467546]
+z_index = 1
+
+[node name="HUD" parent="." unique_id=572777215 instance=ExtResource("3_hud")]
+
+[node name="ProjectileSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("10_laser")
+volume_db = -8.0
+
+[node name="MagicSuccessSound" type="AudioStreamPlayer" parent="." unique_id=1241540033]
+stream = ExtResource("4_magic_success")
+volume_db = -8.0
+max_polyphony = 4
+
+[node name="MagicFailSound" type="AudioStreamPlayer" parent="." unique_id=1860426091]
+stream = ExtResource("5_magic_fail")
+volume_db = -8.0
+max_polyphony = 2
+
+[node name="LevelClearSound" type="AudioStreamPlayer" parent="." unique_id=1524191385]
+stream = ExtResource("6_level_clear")
+volume_db = -6.0
+
+[node name="DoorOpenSound" type="AudioStreamPlayer" parent="." unique_id=1643298854]
+stream = ExtResource("7_door_open")
+volume_db = -6.0
+
+[connection signal="died" from="Player" to="GestureCanvas/Canvas" method="_on_player_died"]

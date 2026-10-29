@@ -1,0 +1,8 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://bae8wp82onac1"]
+
+[ext_resource type="Shader" uid="uid://cy8uktfmhe6gw" path="res://resources/ui/backgrounds/menu_pattern.gdshader" id="1"]
+
+[resource]
+shader = ExtResource("1")
+shader_parameter/background_color = Color(0.065, 0.027, 0.078, 0.985)
+shader_parameter/ink_color = Color(0.79, 0.51, 0.23, 0.09)

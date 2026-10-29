@@ -5,7 +5,7 @@ func _initialize() -> void:
 	call_deferred("test_wand")
 
 func test_wand() -> void:
-	var player := (load("res://scenes/player.tscn") as PackedScene).instantiate()
+	var player := (load("res://scenes/gameplay/player.tscn") as PackedScene).instantiate()
 	var wand = player.get_node("Wand")
 	wand.set_process(false)
 	player.get_node("Camera2D").enabled = false

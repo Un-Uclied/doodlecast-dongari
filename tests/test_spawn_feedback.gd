@@ -1,6 +1,6 @@
 extends Node
 
-const ENEMY := preload("res://scripts/enemy.gd")
+const ENEMY := preload("res://scripts/gameplay/enemy.gd")
 var completed_spawns: Array = []
 
 func _ready() -> void:
@@ -38,7 +38,7 @@ func test_feedback() -> void:
 	var timer: Timer = warning.get_node("SpawnTimer")
 	assert(is_equal_approx(timer.wait_time, 0.2) and warning.get_node("Sparks").emitting)
 	assert(warning.get_node("Sparks").color_ramp.get_color(0).r > 0.9 and warning.get_node("Light").energy > 0.0)
-	assert(level.hud.get_node("%Remaining").text == "남은 적  %d" % level.enemy_budget(), "Warnings must not reduce the remaining enemy count")
+	assert(level.hud.get_node("Root/Top/%Remaining").text == "남은 적  %d" % level.enemy_budget(), "Warnings must not reduce the remaining enemy count")
 	level.player.get_node("Camera2D").global_position = location
 	level.canvas.get_node("Panel").hide()
 	level.canvas.gesture_finished.emit({"pattern_id": &"horizontal"}, 0, 1)

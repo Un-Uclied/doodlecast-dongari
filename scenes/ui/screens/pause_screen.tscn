@@ -1,0 +1,85 @@
+[gd_scene format=3]
+
+[ext_resource type="FontFile" uid="uid://cpo53il2jcgk" path="res://fonts/Cafe24PROUP.ttf" id="2_heading"]
+[ext_resource type="Material" uid="uid://bae8wp82onac1" path="res://resources/ui/backgrounds/menu_background.tres" id="4_background"]
+[ext_resource type="Theme" uid="uid://di013qfonntde" path="res://resources/ui/menu_theme.tres" id="5_theme"]
+[ext_resource type="Script" uid="uid://dghx0r5r8ddpn" path="res://scripts/ui/arcane_frame.gd" id="6_frame"]
+
+[ext_resource type="StyleBoxFlat" path="res://resources/ui/styles/menu_card.tres" id="ui_card"]
+
+[node name="Paused" type="ColorRect" unique_id=1677509945]
+material = ExtResource("4_background")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("5_theme")
+
+[node name="Margin" type="MarginContainer" parent="." unique_id=2088838205]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="Scroll" type="ScrollContainer" parent="Margin" unique_id=163497126]
+layout_mode = 2
+follow_focus = true
+horizontal_scroll_mode = 0
+
+[node name="Center" type="CenterContainer" parent="Margin/Scroll" unique_id=326809717]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Card" type="PanelContainer" parent="Margin/Scroll/Center" unique_id=1335837835]
+custom_minimum_size = Vector2(560, 0)
+layout_mode = 2
+theme_override_styles/panel = ExtResource("ui_card")
+script = ExtResource("6_frame")
+
+[node name="Rows" type="VBoxContainer" parent="Margin/Scroll/Center/Card" unique_id=1410097382]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Margin/Scroll/Center/Card/Rows" unique_id=339959951]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.86, 0.66, 1, 1)
+theme_override_fonts/font = ExtResource("2_heading")
+theme_override_font_sizes/font_size = 36
+text = "일시정지"
+horizontal_alignment = 1
+
+[node name="PauseStage" type="Label" parent="Margin/Scroll/Center/Card/Rows" unique_id=2000128664]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.73, 0.6, 0.75, 1)
+theme_override_font_sizes/font_size = 16
+text = "NORMAL  ·  레벨 1 / 6"
+horizontal_alignment = 1
+
+[node name="Hint" type="Label" parent="Margin/Scroll/Center/Card/Rows" unique_id=312863284]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.74, 0.56, 1)
+theme_override_font_sizes/font_size = 16
+text = "준비되면 계속하세요."
+horizontal_alignment = 1
+
+[node name="Resume" type="Button" parent="Margin/Scroll/Center/Card/Rows" unique_id=158469242]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+text = "계속하기 (Esc)"
+
+[node name="PauseMenu" type="Button" parent="Margin/Scroll/Center/Card/Rows" unique_id=2038607514]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 46)
+layout_mode = 2
+text = "메인 메뉴로"

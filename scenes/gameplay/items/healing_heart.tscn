@@ -1,0 +1,27 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/gameplay/healing_heart.gd" id="1"]
+[ext_resource type="SpriteFrames" path="res://resources/items/healing_heart_frames.tres" id="2"]
+[ext_resource type="Texture2D" path="res://resources/effects/soft_particle.tres" id="3"]
+[ext_resource type="Script" path="res://scripts/gestures/pattern_badge.gd" id="4_badge"]
+
+[node name="HealingHeart" type="Node2D"]
+texture_filter = 1
+script = ExtResource("1")
+
+[node name="Sprite" type="AnimatedSprite2D" parent="."]
+position = Vector2(0, -11)
+scale = Vector2(0.65, 0.65)
+sprite_frames = ExtResource("2")
+autoplay = "idle"
+
+[node name="Light" type="PointLight2D" parent="."]
+position = Vector2(0, -12)
+color = Color(1, 0.78, 0.3, 1)
+energy = 0.85
+texture = ExtResource("3")
+texture_scale = 1.5
+
+[node name="Pattern" type="Node2D" parent="."]
+position = Vector2(0, -36)
+script = ExtResource("4_badge")

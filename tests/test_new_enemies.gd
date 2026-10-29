@@ -1,6 +1,6 @@
 extends Node
 
-const ENEMY := preload("res://scripts/enemy.gd")
+const ENEMY := preload("res://scripts/gameplay/enemy.gd")
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -41,7 +41,7 @@ func test_enemies() -> void:
 			enemy.set_physics_process(false)
 			enemy.get_node("Contact").monitoring = false
 			if enemy.kind == ENEMY.Kind.BOMB_WALKER:
-				assert(enemy.pattern.size() == 1 and enemy.pattern[0] in map.SIMPLE_PATTERNS and enemy.reward == 100)
+				assert(enemy.pattern.size() == 1 and enemy.pattern[0] in PatternCatalog.TIER_1 and enemy.reward == 100)
 			elif enemy.kind in [ENEMY.Kind.BAT, ENEMY.Kind.FLOATING_EYE, ENEMY.Kind.FLAME_WISP]:
 				assert(enemy.pattern.size() >= map.LENGTHS[map.difficulty - 1].x, "Bat, eye and wisp use ordinary difficulty rules")
 			if enemy.kind >= ENEMY.Kind.BOMB_WALKER:
@@ -171,9 +171,9 @@ func test_enemies() -> void:
 	await ticks(3)
 	assert(effect.get_node("HitRing").global_position == impact, "The burst ring must stay at the hit position as actors move")
 	level.hud.pulse_remaining()
-	level.hud._remaining_tween.pause()
-	level.hud._remaining_tween.custom_step(0.1)
-	assert(level.hud.get_node("%Remaining").scale.x > 1.6, "Kill text impact must be larger than before")
+	level.hud.status._remaining_tween.pause()
+	level.hud.status._remaining_tween.custom_step(0.1)
+	assert(level.hud.get_node("Root/Top/%Remaining").scale.x > 1.6, "Kill text impact must be larger than before")
 	if DisplayServer.get_name() != "headless":
 		await RenderingServer.frame_post_draw
 		assert(get_viewport().get_texture().get_image().save_png("res://.godot/magic-hit-preview.png") == OK)

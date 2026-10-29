@@ -10,7 +10,7 @@ const FAILURE := Color(1.0, 0.5, 0.45, 0.85)
 @export var catalog: PatternCatalog
 @export var show_recognition_details := true
 ## 그린 모양의 가로·세로 중 긴 길이가 화면의 짧은 변에서 차지해야 하는 최소 비율입니다.
-@export_range(1.0, 100.0, 0.5, "suffix:%") var min_stroke_size_percent := 6.0
+@export_range(1.0, 100.0, 0.5, "suffix:%") var min_stroke_size_percent := 2.0
 
 @onready var result_label: Label = $Panel/Margin/Rows/Result
 @onready var detail_label: Label = $Panel/Margin/Rows/Detail

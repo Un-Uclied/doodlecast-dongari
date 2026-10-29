@@ -18,7 +18,7 @@ func ticks(count := 1) -> void:
 
 func test_player() -> void:
 	create_timer(12.0).timeout.connect(func(): quit(1))
-	var player := (load("res://scenes/player.tscn") as PackedScene).instantiate()
+	var player := (load("res://scenes/gameplay/player.tscn") as PackedScene).instantiate()
 	root.add_child(player)
 	await ticks(2)
 	var frames: SpriteFrames = player.sprite.sprite_frames
@@ -91,7 +91,7 @@ func test_player() -> void:
 	assert(not player.take_damage(), "Dead players must not take further damage")
 	assert(not player.get_node("DashParticles").emitting)
 	player.free()
-	var map := (load("res://scenes/test_scene.tscn") as PackedScene).instantiate()
+	var map := (load("res://scenes/sandbox/test_scene.tscn") as PackedScene).instantiate()
 	root.add_child(map)
 	player = map.get_node("Player")
 	await ticks(2)
@@ -115,7 +115,7 @@ func test_player() -> void:
 	key(KEY_SHIFT, true)
 	await ticks()
 	assert(player.is_invulnerable and not player.is_dead)
-	var pit := (load("res://scenes/pit.tscn") as PackedScene).instantiate() as Area2D
+	var pit := (load("res://scenes/gameplay/pit.tscn") as PackedScene).instantiate() as Area2D
 	pit.position = player.global_position + player.dash_direction * 8
 	map.add_child(pit)
 	await ticks(2)

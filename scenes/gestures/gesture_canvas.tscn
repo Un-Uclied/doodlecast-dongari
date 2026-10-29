@@ -94,8 +94,8 @@ theme_override_constants/separation = 5
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_body")
 theme_override_font_sizes/font_size = 15
-text = "드래그: —  |  ∧  V  별  소용돌이  ·  우클릭: 취소
-WASD 이동  ·  Shift 대시  ·  Esc 일시정지"
+text = "좌클릭으로 문양 그리기 · 맨 왼쪽부터
+WASD 이동 · SHIFT 무적 대시 · ESC 일시정지"
 
 [node name="Result" type="Label" parent="Canvas/Panel/Margin/Rows" unique_id=1065616236]
 layout_mode = 2

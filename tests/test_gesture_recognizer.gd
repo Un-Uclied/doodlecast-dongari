@@ -6,7 +6,7 @@ func _initialize() -> void:
 
 func test_recognizer() -> void:
 	var catalog := load("res://resources/patterns/catalog.tres") as PatternCatalog
-	assert(catalog.patterns.size() == 7)
+	assert(catalog.patterns.size() == 9)
 	var recognizer := GestureRecognizer.new(catalog)
 	assert(recognizer.configuration_error.is_empty(), recognizer.configuration_error)
 	for pattern in catalog.patterns:
@@ -89,5 +89,5 @@ func test_recognizer() -> void:
 	var invalid_concavity := catalog.duplicate(true) as PatternCatalog
 	invalid_concavity.patterns[-1].min_concavity = NAN
 	assert(not GestureRecognizer.new(invalid_concavity).configuration_error.is_empty())
-	print("PASS: seven gestures, reverse strokes, translation/scale, uneven sampling/noise, pentagram and outlined stars, star start positions/rotation, spiral winding/rotation, heart, invalid inputs, unknown shapes, catalog validation")
+	print("PASS: nine gestures, reverse strokes, translation/scale, uneven sampling/noise, pentagram and outlined stars, star start positions/rotation, spiral winding/rotation, heart, invalid inputs, unknown shapes, catalog validation")
 	quit()

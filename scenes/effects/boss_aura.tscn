@@ -1,0 +1,19 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/effects/boss_aura.gd" id="1"]
+[ext_resource type="Shader" path="res://resources/effects/boss_aura.gdshader" id="2"]
+
+[sub_resource type="ShaderMaterial" id="Aura"]
+resource_local_to_scene = true
+shader = ExtResource("2")
+shader_parameter/aura_time = 0.0
+shader_parameter/rage = 0.0
+
+[node name="BossAura" type="Node2D"]
+z_index = -1
+script = ExtResource("1")
+
+[node name="Glow" type="Polygon2D" parent="."]
+material = SubResource("Aura")
+polygon = PackedVector2Array(-48, -48, 48, -48, 48, 48, -48, 48)
+uv = PackedVector2Array(0, 0, 1, 0, 1, 1, 0, 1)

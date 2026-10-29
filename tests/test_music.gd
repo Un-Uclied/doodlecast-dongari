@@ -36,7 +36,7 @@ func check_ducked(since: float) -> void:
 
 func test_music() -> void:
 	var music_id := Music.get_instance_id()
-	var menu := (load("res://scenes/main_menu.tscn") as PackedScene).instantiate()
+	var menu := (load("res://scenes/ui/main_menu.tscn") as PackedScene).instantiate()
 	get_tree().root.add_child(menu)
 	get_tree().current_scene = menu
 	assert(Music.stream == Music.MENU_TRACK and Music.playing and Music.volume_db == -60.0)
@@ -56,7 +56,7 @@ func test_music() -> void:
 	var enemy = await level.spawn_enemy(0)
 	var before: Vector2 = enemy.global_position
 	var position := Music.get_playback_position()
-	level.hud.get_node("%PauseButton").pressed.emit()
+	level.hud.get_node("Root/Top/%PauseButton").pressed.emit()
 	assert(get_tree().paused and level.hud.get_node("%Paused").visible and not level.canvas.input_enabled)
 	await check_ducked(position)
 	assert(enemy.global_position == before and not level.player.can_process(), "Pause must freeze gameplay")
@@ -66,7 +66,7 @@ func test_music() -> void:
 	assert(is_equal_approx(Music.volume_db, Music.NORMAL_DB) and enemy.global_position != before)
 	await press_escape()
 	assert(get_tree().paused)
-	level.hud.get_node("%Resume").pressed.emit()
+	level.hud.get_node("Root/Paused/%Resume").pressed.emit()
 	assert(not get_tree().paused)
 
 	position = Music.get_playback_position()
@@ -88,7 +88,7 @@ func test_music() -> void:
 	level.finish_level(true)
 	await check_ducked(position)
 	position = Music.get_playback_position()
-	level.hud.get_node("%Continue").pressed.emit()
+	level.hud.get_node("Root/Results/%Continue").pressed.emit()
 	await ticks()
 	level = get_tree().current_scene
 	level._spawn_time_left = 1000.0
@@ -103,9 +103,9 @@ func test_music() -> void:
 	position = Music.get_playback_position()
 	level.finish_level(true)
 	await check_ducked(position)
-	assert(level.hud.get_node("%ResultTitle").text == "ALL CLEAR")
-	level.hud.get_node("%Menu").pressed.emit()
-	level.hud.get_node("%ExitConfirm").pressed.emit()
+	assert(level.hud.get_node("Root/Results/%ResultTitle").text == "ALL CLEAR")
+	level.hud.get_node("Root/Results/%Menu").pressed.emit()
+	level.hud.get_node("Root/MenuConfirmation/%ExitConfirm").pressed.emit()
 	await ticks()
 	assert(get_tree().current_scene.name == "MainMenu")
 	get_tree().current_scene.student_id_input.text = "10101"
@@ -115,8 +115,8 @@ func test_music() -> void:
 	level._spawn_time_left = 1000.0
 	await press_escape()
 	assert(get_tree().paused)
-	level.hud.get_node("%PauseMenu").pressed.emit()
-	level.hud.get_node("%ExitConfirm").pressed.emit()
+	level.hud.get_node("Root/Paused/%PauseMenu").pressed.emit()
+	level.hud.get_node("Root/MenuConfirmation/%ExitConfirm").pressed.emit()
 	await ticks()
 	assert(not get_tree().paused and get_tree().current_scene.name == "MainMenu")
 	assert(Music.stream == Music.MENU_TRACK and Music.playing and Music.volume_db < Music.NORMAL_DB)

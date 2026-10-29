@@ -8,8 +8,10 @@
 [ext_resource type="Resource" uid="uid://1d6nnk4s2apm" path="res://resources/patterns/chevron_down.tres" id="6"]
 [ext_resource type="Resource" uid="uid://bemmgx4n0rnya" path="res://resources/patterns/star.tres" id="7"]
 [ext_resource type="Resource" uid="uid://gs2kgipcca45" path="res://resources/patterns/spiral.tres" id="8"]
-[ext_resource type="Resource" path="res://resources/patterns/heart.tres" id="9"]
+[ext_resource type="Resource" uid="uid://dbkxqdwt1mgxr" path="res://resources/patterns/heart.tres" id="9"]
+[ext_resource type="Resource" path="res://resources/patterns/square.tres" id="10"]
+[ext_resource type="Resource" path="res://resources/patterns/triangle.tres" id="11"]
 
 [resource]
 script = ExtResource("1")
-patterns = Array[ExtResource("2")]([ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("7"), ExtResource("8"), ExtResource("9")])
+patterns = Array[ExtResource("2")]([ExtResource("3"), ExtResource("4"), ExtResource("5"), ExtResource("6"), ExtResource("10"), ExtResource("11"), ExtResource("7"), ExtResource("9"), ExtResource("8")])

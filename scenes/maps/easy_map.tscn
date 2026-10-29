@@ -1,6 +1,6 @@
 [gd_scene format=4 uid="uid://d2j3ehxefr4ug"]
 
-[ext_resource type="PackedScene" uid="uid://c51pu4xrjqmvt" path="res://scenes/combat_level.tscn" id="1_level"]
+[ext_resource type="PackedScene" uid="uid://c51pu4xrjqmvt" path="res://scenes/gameplay/combat_level.tscn" id="1_level"]
 
 [node name="EasyMap" unique_id=681549799 instance=ExtResource("1_level")]
 mode = 0
@@ -16,4 +16,3 @@ tile_map_data = PackedByteArray("AAD//wUAAAALAAIAAAAAAAUAAAALAAIAAAD+/wUAAAALAAI
 
 [node name="Player" parent="." index="3" unique_id=1260775407]
 position = Vector2(0, 266)
-

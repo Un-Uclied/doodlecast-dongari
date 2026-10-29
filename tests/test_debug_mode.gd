@@ -27,7 +27,7 @@ func key(code: Key, echo := false) -> void:
 
 func test_debug() -> void:
 	GameRun.set_player_info("", "")
-	var menu = load("res://scenes/main_menu.tscn").instantiate()
+	var menu = load("res://scenes/ui/main_menu.tscn").instantiate()
 	get_tree().root.add_child(menu)
 	get_tree().current_scene = menu
 	await ticks(2)
@@ -47,37 +47,36 @@ func test_debug() -> void:
 	Leaderboard._busy = true
 	var pending_count := Leaderboard.pending.size()
 	GameRun.set_player_info("12345", "디버그")
-	for number in range(1, 7):
-		var level = get_tree().current_scene
-		assert(level.level_number == number and GameRun.debug_run and level.enemy_budget() == 1)
-		assert(level.player.health == 5 and level.hud.get_node("%Stage").text.begins_with("DEBUG"), "Each debug level must refill health and clearly identify the mode")
-		while level.enemies.is_empty():
-			await ticks()
-		level.set_process(false)
-		level.player.set_physics_process(false)
-		var enemy = level.enemies[0]
-		enemy.set_physics_process(false)
-		enemy.get_node("Contact").monitoring = false
-		assert(enemy.kind == number - 1 and level.spawned == 1 and level._pending_spawns.is_empty(), "Six debug levels must deterministically cover all six enemy kinds")
-		assert(await level.spawn_enemy() == null, "Debug must never spawn a second enemy")
-		level.player.health = 2
-		GameRun.health = 2
-		level.furniture.clear()
-		enemy.pattern.assign([&"horizontal"])
-		enemy.consume_pattern(&"horizontal")
-		assert(level.finished and level.hud.get_node("%ResultStage").text.begins_with("DEBUG"))
-		while not level.hud.get_node("%Results").visible:
-			await ticks()
-		assert(Leaderboard.pending.size() == pending_count, "Debug runs must never reach the real score queue, even with a valid student ID")
-		if number < 6:
-			level.hud.get_node("%Continue").pressed.emit()
-			await ticks()
-		else:
-			assert(level.hud.get_node("%ResultTitle").text == "ALL CLEAR" and not level.hud.get_node("%Continue").visible)
-			assert(level.hud.get_node("%RankingStatus").text.contains("디버그"))
-			level._menu()
-			level.hud.get_node("%ExitConfirm").pressed.emit()
-			await ticks()
+	var level = get_tree().current_scene
+	assert(level.is_boss_fight() and level.level_number == 6 and level.enemy_budget() == 0 and level.onboarding == null)
+	assert(level.player.health == 5 and level.hud.get_node("Root/Top/%Stage").text == "DEBUG · BOSS TEST")
+	assert(await level.spawn_enemy() == null and level.enemies.is_empty())
+	level.set_process(false)
+	level.player.set_physics_process(false)
+	while not level.navigation_ready:
+		await ticks()
+	level.player.health = 1
+	GameRun.health = 1
+	level._schedule_heart(1)
+	level._update_heart_drop(7)
+	assert(is_instance_valid(level._heart), "Debug boss must include the real healing-item rules")
+	level.canvas.gesture_finished.emit({"pattern_id": &"heart"}, 0, 1)
+	assert(level.player.health == 2 and level._heart == null)
+	for cycle in range(ceili(float(level.MAX_BOSS_HEALTH) / level.WINDOW_DAMAGE)):
+		level._begin_window()
+		assert(not &"heart" in level.attack_sequence)
+		for id in level.attack_sequence.duplicate():
+			level.canvas.gesture_finished.emit({"pattern_id": id}, 0, 1)
+	assert(level.finished and level.boss_health == 0)
+	while not level.hud.get_node("%Results").visible:
+		await ticks()
+	assert(Leaderboard.pending.size() == pending_count, "Debug boss completion must never enter the real score queue")
+	assert(level.hud.get_node("Root/Results/%ResultTitle").text == "ALL CLEAR" and not level.hud.get_node("Root/Results/%Continue").visible)
+	assert(level.hud.get_node("Root/Results/%ResultStage").text == "DEBUG · 보스 테스트")
+	assert(level.hud.get_node("Root/Results/%RankingStatus").text.contains("디버그"))
+	level._menu()
+	level.hud.get_node("Root/MenuConfirmation/%ExitConfirm").pressed.emit()
+	await ticks()
 	Leaderboard.enabled = was_enabled
 	Leaderboard._busy = false
 	menu = get_tree().current_scene
@@ -88,5 +87,8 @@ func test_debug() -> void:
 	normal.set_process(false)
 	assert(not GameRun.debug_run and GameRun.mode_name == "HARD" and normal.enemy_budget() > 1)
 	assert(GameRun.award(100) == 125, "A normal run must restore standard budgets and the new HARD reward multiplier")
-	print("PASS: physical Konami keys through focused menu inputs, wrong/repeated-key rejection, no-ID debug entry, one deterministic enemy per level across all six kinds, health refill, DEBUG labels/results, no ranking writes, normal-mode reset, HARD x1.25")
+	print("PASS: Konami/wrong/repeated-key handling, no-ID entry into one boss-only debug stage, real hearts and attack windows, DEBUG UI/results, no next stage or ranking writes, normal-mode reset")
+	Music.stop()
+	normal.queue_free()
+	await get_tree().create_timer(0.2).timeout
 	get_tree().quit()

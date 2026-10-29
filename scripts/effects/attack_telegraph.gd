@@ -3,7 +3,6 @@ extends Node2D
 signal charged
 
 @export var duration := 0.8
-@export var radial_fill := false
 @export var points := PackedVector2Array([Vector2(0, -8), Vector2(160, -8), Vector2(160, 8), Vector2(0, 8)])
 var progress := 0.0
 
@@ -18,14 +17,15 @@ func restart() -> void:
 	var outline := points.duplicate()
 	outline.append(points[0])
 	$Outline.points = outline
-	var start := points[0].x
-	var end := points[0].x
+	var bounds := Rect2(points[0], Vector2.ZERO)
 	for point in points:
-		start = minf(start, point.x)
-		end = maxf(end, point.length() if radial_fill else point.x)
-	$Fill.material.set_shader_parameter("radial_fill", radial_fill)
-	$Fill.material.set_shader_parameter("fill_start", 0.0 if radial_fill else start)
-	$Fill.material.set_shader_parameter("fill_end", end)
+		bounds = bounds.expand(point)
+	var center := bounds.get_center()
+	var radius := 0.0
+	for point in points:
+		radius = maxf(radius, center.distance_to(point))
+	$Fill.material.set_shader_parameter("fill_center", center)
+	$Fill.material.set_shader_parameter("fill_radius", radius)
 	$Fill.material.set_shader_parameter("progress", progress)
 
 func _physics_process(delta: float) -> void:

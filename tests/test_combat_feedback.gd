@@ -13,12 +13,12 @@ func ticks(count := 1) -> void:
 		await get_tree().process_frame
 
 func expect_feedback(hud: CanvasLayer, kind: StringName, text: String) -> void:
-	assert(hud.get_node("%FeedbackText").text == text)
-	var flash: ColorRect = hud.get_node("%DamageFlash" if kind == &"damage" else "%ActionFlash")
+	assert(hud.get_node("Root/CombatFeedback/%FeedbackText").text == text)
+	var flash: ColorRect = hud.get_node("Root/CombatFeedback/%DamageFlash" if kind == &"damage" else "Root/CombatFeedback/%ActionFlash")
 	assert(flash.material.get_shader_parameter("tint") == hud.FEEDBACK[kind].color)
 	assert(is_equal_approx(flash.material.get_shader_parameter("strength"), hud.FEEDBACK[kind].strength))
 	assert(flash.mouse_filter == Control.MOUSE_FILTER_IGNORE)
-	assert(hud.get_node("%FeedbackText").scale.x > 1.0)
+	assert(hud.get_node("Root/CombatFeedback/%FeedbackText").scale.x > 1.0)
 
 func render_feedback(level: Node2D, kind: StringName) -> void:
 	if DisplayServer.get_name() == "headless":
@@ -46,7 +46,7 @@ func test_feedback() -> void:
 	while not level.navigation_ready:
 		await ticks()
 	var hud: CanvasLayer = level.hud
-	assert(hud.get_node("%ActionFlash").material != hud.get_node("%DamageFlash").material)
+	assert(hud.get_node("Root/CombatFeedback/%ActionFlash").material != hud.get_node("Root/CombatFeedback/%DamageFlash").material)
 	var enemy = await level.spawn_enemy(0)
 	var survivor = await level.spawn_enemy(1)
 	for target in [enemy, survivor]:
@@ -75,22 +75,22 @@ func test_feedback() -> void:
 	expect_feedback(hud, &"damage", "피격 -1")
 	assert(level.player._shake_strength >= 5.0)
 	await render_feedback(level, &"damage")
-	var red: float = hud.get_node("%DamageFlash").material.get_shader_parameter("strength")
+	var red: float = hud.get_node("Root/CombatFeedback/%DamageFlash").material.get_shader_parameter("strength")
 	level.canvas.gesture_finished.emit({"pattern_id": &"star"}, 0, 1)
 	expect_feedback(hud, &"hit", "적중 ×1")
-	assert(hud.get_node("%DamageFlash").material.get_shader_parameter("strength") == red, "Attack feedback must not erase the independent damage rim")
+	assert(hud.get_node("Root/CombatFeedback/%DamageFlash").material.get_shader_parameter("strength") == red, "Attack feedback must not erase the independent damage rim")
 	assert(not level.player.take_damage(), "Rejected damage must not trigger another damage flash")
 	level.player.shake_camera(100.0)
 	assert(level.player._shake_strength == 10.0, "Large multi-kills must cap camera shake")
 	level._toggle_pause()
-	var paused: float = hud.get_node("%ActionFlash").material.get_shader_parameter("strength")
+	var paused: float = hud.get_node("Root/CombatFeedback/%ActionFlash").material.get_shader_parameter("strength")
 	await get_tree().create_timer(0.12).timeout
-	assert(not hud.get_node("%CombatFeedback").visible and hud.get_node("%ActionFlash").material.get_shader_parameter("strength") == paused)
+	assert(not hud.get_node("%CombatFeedback").visible and hud.get_node("Root/CombatFeedback/%ActionFlash").material.get_shader_parameter("strength") == paused)
 	level._toggle_pause()
 	await get_tree().create_timer(0.7).timeout
-	assert(hud.get_node("%ActionFlash").material.get_shader_parameter("strength") == 0.0)
-	assert(hud.get_node("%DamageFlash").material.get_shader_parameter("strength") == 0.0)
-	assert(hud.get_node("%FeedbackText").modulate.a == 0.0 and hud.get_node("%FeedbackText").scale == Vector2.ONE)
+	assert(hud.get_node("Root/CombatFeedback/%ActionFlash").material.get_shader_parameter("strength") == 0.0)
+	assert(hud.get_node("Root/CombatFeedback/%DamageFlash").material.get_shader_parameter("strength") == 0.0)
+	assert(hud.get_node("Root/CombatFeedback/%FeedbackText").modulate.a == 0.0 and hud.get_node("Root/CombatFeedback/%FeedbackText").scale == Vector2.ONE)
 	assert(level.player.get_node("Camera2D").offset == Vector2.ZERO)
 	level.finish_level(false)
 	await get_tree().create_timer(0.4).timeout
@@ -98,4 +98,6 @@ func test_feedback() -> void:
 	level.queue_free()
 	await ticks(2)
 	print("PASS: actual cast/fail/hit/kill/damage events have distinct captions and colored edge feedback, clear center, independent damage rim, stronger hit/kill/hurt shake with cap/recovery, pause freeze, no input blocking, result cleanup")
+	Music.stop()
+	await get_tree().create_timer(0.2).timeout
 	get_tree().quit()

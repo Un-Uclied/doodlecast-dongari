@@ -62,12 +62,12 @@ func test_visuals() -> void:
 	await RenderingServer.frame_post_draw
 	var icons := get_viewport().get_texture().get_image()
 	var vertical_transform: Transform2D = level.enemies[0].get_global_transform_with_canvas()
-	var vertical_center := Vector2i(vertical_transform * Vector2(6, -27.5))
+	var vertical_center := Vector2i(vertical_transform * Vector2(7, -36))
 	assert(icons.get_pixelv(vertical_center).b > 0.5, "The vertical icon must be drawn in the center of its slot")
 	for side in [-4, 4]:
-		var margin := Vector2i(vertical_transform * Vector2(6 + side, -27.5))
+		var margin := Vector2i(vertical_transform * Vector2(7 + side, -36))
 		assert(icons.get_pixelv(margin).b < 0.2, "The vertical icon must leave equal clear margins")
-	var horizontal_center := Vector2i(level.enemies[2].get_global_transform_with_canvas() * Vector2(0, -27.5))
+	var horizontal_center := Vector2i(level.enemies[2].get_global_transform_with_canvas() * Vector2(0, -36))
 	assert(icons.get_pixelv(horizontal_center).r > 0.5, "The horizontal icon must be vertically centered as well")
 	var star = load("res://resources/patterns/star.tres")
 	var sample: PackedVector2Array = star.samples[0]

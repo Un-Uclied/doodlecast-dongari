@@ -1,7 +1,7 @@
 extends Node
 
-const LEVEL_SCRIPT := preload("res://scripts/level.gd")
-const EXPECTED_DIFFICULTIES := [[1, 1, 2, 2, 3, 4], [2, 2, 3, 3, 4, 5], [3, 3, 4, 4, 5, 6]]
+const LEVEL_SCRIPT := preload("res://scripts/gameplay/level.gd")
+const EXPECTED_DIFFICULTIES := [[1, 1, 2, 2, 3, 4], [2, 2, 3, 3, 3, 3], [3, 3, 4, 4, 4, 4]]
 
 @onready var root: Window = get_tree().root
 
@@ -27,10 +27,10 @@ func test_combat() -> void:
 			var scene := (load(GameRun.level_path()) as PackedScene).instantiate()
 			assert(scene.difficulty == EXPECTED_DIFFICULTIES[mode][number - 1])
 			assert(scene.level_number == number and scene.mode == mode)
-			assert(scene.enemy_budget() == 12 + 2 * scene.difficulty + number, "Every level must add exactly four enemies")
+			assert(scene.enemy_budget() == (0 if number == 6 else 12 + 2 * scene.difficulty + number), "Level six is the boss fight; other levels keep their enemy budgets")
 			var old_interval: float = (4.0 - 0.4 * scene.difficulty) * (1.0 - 0.04 * (number - 1)) / GameRun.SPAWN_MULTIPLIERS[mode]
 			if mode == GameRun.Mode.HARD:
-				assert(is_equal_approx(scene.spawn_interval(), 2.0 - 0.1 * (number - 1)), "HARD must start at 2 seconds and reach 1.5 seconds gradually")
+				assert(is_equal_approx(scene.spawn_interval(), maxf(1.8, 2.0 - 0.06 * (number - 1))), "HARD spawn acceleration must stop at 1.8 seconds")
 			else:
 				assert(scene.spawn_interval() < old_interval * 0.85 and scene.spawn_interval() > 0.8 and scene.spawn_interval() < 1.7)
 			assert(scene.has_node("Player") and scene.has_node("Enemies") and scene.has_node("HUD"))
@@ -44,8 +44,8 @@ func test_combat() -> void:
 			var sequence: Array[StringName] = rules.generate_pattern()
 			var hard := 0
 			for symbol in sequence:
-				assert(symbol in [&"horizontal", &"vertical", &"chevron_up", &"chevron_down", &"star", &"spiral"])
-				if symbol in [&"star", &"spiral"]:
+				assert(symbol in PatternCatalog.TIER_1 + PatternCatalog.TIER_2 + PatternCatalog.TIER_3)
+				if symbol in PatternCatalog.TIER_3:
 					hard += 1
 			if difficulty == 1:
 				assert(sequence.size() in [1, 2] and hard == 0)
@@ -65,7 +65,8 @@ func test_combat() -> void:
 		var frames := load("res://resources/enemies/%s_frames.tres" % kind) as SpriteFrames
 		assert(frames.get_frame_count("idle") == 6 and frames.get_frame_count("walk") == 8)
 
-	var menu := (load("res://scenes/main_menu.tscn") as PackedScene).instantiate()
+	var menu := (load("res://scenes/ui/main_menu.tscn") as PackedScene).instantiate()
+	Leaderboard.tutorials["10101".sha256_text()] = 1
 	root.add_child(menu)
 	get_tree().current_scene = menu
 	await ticks(2)
@@ -153,10 +154,10 @@ func test_combat() -> void:
 		await ticks(3)
 	assert(level.finished and level.player.is_dead and GameRun.health == 0)
 	await get_tree().create_timer(0.4).timeout
-	assert(level.hud.get_node("%ResultTitle").text == "GAME OVER")
+	assert(level.hud.get_node("Root/Results/%ResultTitle").text == "GAME OVER")
 	assert(level.hud.get_node("%Results").visible and not level.canvas.input_enabled)
-	assert(level.hud.get_node("%ResultCombatScore").text == level.hud.format_number(kill_points) + "점")
-	assert(level.hud.get_node("%ResultIdentity").text.contains("10101") and level.hud.get_node("%ResultIdentity").text.contains("홍*동"))
+	assert(level.hud.get_node("Root/Results/%ResultCombatScore").text == level.hud.format_number(kill_points) + "점")
+	assert(level.hud.get_node("Root/Results/%ResultIdentity").text.contains("10101") and level.hud.get_node("Root/Results/%ResultIdentity").text.contains("홍*동"))
 
 	GameRun.begin_run(1)
 	GameRun.health = 3
@@ -174,11 +175,11 @@ func test_combat() -> void:
 	var expected: int = GameRun.total_score + last.reward + 250 * level.difficulty
 	last.consume_pattern(&"horizontal")
 	await ticks(2)
-	assert(level.finished and level.hud.get_node("%ResultTitle").text == "LEVEL CLEAR")
-	assert(level.hud.get_node("%Continue").visible and GameRun.total_score == expected)
+	assert(level.finished and level.hud.get_node("Root/Results/%ResultTitle").text == "LEVEL CLEAR")
+	assert(level.hud.get_node("Root/Results/%Continue").visible and GameRun.total_score == expected)
 	var earned := GameRun.combat_score
 	var elapsed := GameRun.elapsed_seconds
-	level.hud.get_node("%Continue").pressed.emit()
+	level.hud.get_node("Root/Results/%Continue").pressed.emit()
 	await ticks(2)
 	level = get_tree().current_scene
 	while not level.navigation_ready:
@@ -195,17 +196,15 @@ func test_combat() -> void:
 	while not level.navigation_ready:
 		await get_tree().process_frame
 	level._spawn_time_left = 1000.0
-	level.spawned = level.enemy_budget() - 1
-	last = await level.spawn_enemy(0)
-	last.pattern.assign([&"horizontal"])
-	expected = GameRun.total_score + roundi(last.reward * 1.25) + roundi(250 * level.difficulty * 1.25)
-	last.consume_pattern(&"horizontal")
+	assert(level.is_boss_fight() and await level.spawn_enemy(0) == null)
+	expected = GameRun.total_score + roundi(250 * level.difficulty * 1.25)
+	level.finish_level(true)
 	await ticks(2)
-	assert(level.finished and level.hud.get_node("%ResultTitle").text == "ALL CLEAR")
-	assert(not level.hud.get_node("%Continue").visible and GameRun.total_score == expected)
-	assert(level.hud.get_node("%ResultTotal").text == level.hud.format_number(expected))
-	level.hud.get_node("%Menu").pressed.emit()
-	level.hud.get_node("%ExitConfirm").pressed.emit()
+	assert(level.finished and level.hud.get_node("Root/Results/%ResultTitle").text == "ALL CLEAR")
+	assert(not level.hud.get_node("Root/Results/%Continue").visible and GameRun.total_score == expected)
+	assert(level.hud.get_node("Root/Results/%ResultTotal").text == level.hud.format_number(expected))
+	level.hud.get_node("Root/Results/%Menu").pressed.emit()
+	level.hud.get_node("Root/MenuConfirmation/%ExitConfirm").pressed.emit()
 	await ticks(2)
 	assert(get_tree().current_scene.name == "MainMenu")
 	get_tree().current_scene.student_id_input.text = "10101"
@@ -214,9 +213,11 @@ func test_combat() -> void:
 	assert(get_tree().current_scene.level_number == 1 and get_tree().current_scene.mode == 2)
 	assert(GameRun.combat_score == 0 and GameRun.health == 5)
 	get_tree().current_scene._toggle_pause()
-	get_tree().current_scene.hud.get_node("%PauseMenu").pressed.emit()
-	get_tree().current_scene.hud.get_node("%ExitConfirm").pressed.emit()
+	get_tree().current_scene.hud.get_node("Root/Paused/%PauseMenu").pressed.emit()
+	get_tree().current_scene.hud.get_node("Root/MenuConfirmation/%ExitConfirm").pressed.emit()
 	await ticks(2)
 	assert(get_tree().current_scene.name == "MainMenu")
 	print("PASS: all 18 difficulty settings, DIFF 1/7 sequence limits, scaling, Soldier/Orc animations, menu/spawn/chase, ordered multi-target gestures at unlimited distance including offscreen, contact/despawn, five HP, dash immunity, score multipliers, game over, six-level progression, clear/retry/menu")
+	Music.stop()
+	await get_tree().create_timer(0.2).timeout
 	get_tree().quit()

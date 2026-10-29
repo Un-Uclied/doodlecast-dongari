@@ -21,7 +21,9 @@ EASY·NORMAL·HARD는 각각 수정할 수 있는 맵을 사용합니다. 전투
 
 Windows ZIP을 다운로드해 압축을 풀고 `DOODLECAST.exe`를 실행합니다. 게임 데이터가 실행 파일에 포함되어 있어 Godot 설치나 별도의 Firebase 환경 설정은 필요 없습니다. 시작할 때 숫자 다섯 자리의 학번을 입력하며 이름은 선택입니다.
 
-처음이라면 학번 입력칸 오른쪽 **튜토리얼**에서 먼저 연습할 수 있습니다. 1.1.1에 추가된 연습장으로, 학번 없이 시작합니다. 「지팡이 선배」의 짧은 안내에 따라 이동·대시 → 여섯 공격 기호 → 하트 회복을 직접 배웁니다. 기호를 그리는 순서도 예시로 보여줍니다. 연습용 적은 공격하지 않으며 튜토리얼 기록은 순위에 올라가지 않습니다.
+학번에 기존 Firestore 플레이 기록이 없으면 선택한 난이도의 첫 게임에 튜토리얼이 자동으로 이어집니다. 최소 5초 동안 적 없이 이동·무적 대시를 익히고, 실제 대시를 한 번 하면 6종 적과 9종 문양을 연습합니다. 하단의 짧은 텍스트와 그리기 예시를 사용하며, 모든 연습 적을 처치하면 체력·점수·시간을 초기화해 실제 1레벨을 시작합니다. 완료 여부는 같은 PC에도 저장하므로 중도 종료해도 연습을 반복할 필요가 없습니다. 다른 PC에서는 기존 `doodlecast_runs`의 학번 해시를 조회하며 별도 서버 컬렉션이나 권한을 추가하지 않습니다.
+
+현재 작업 버전은 네모·세모를 포함한 9종 문양, 거친 손그림을 받는 인식기, 적·회복 아이템이 공유하는 작은 문양과 첫 기호 화살표를 사용합니다. 마름모·직사각형도 네모로 인식하며, 하트 문양은 회복 아이템에서만 사용합니다. 세 난이도 모두 1~5레벨은 일반 전투, 6레벨은 잡몹 없는 보스전입니다. 그림자 기사의 네 공격을 피한 뒤 7개 문양을 제한시간 안에 완성하면 체력을 20% 깎습니다. 실패하면 대시 무적과 관계없이 체력 1을 잃으며 보스전에서도 회복 하트가 나옵니다. 붉은 경고 필드는 각 필드의 중앙부터 바깥으로 채워집니다. 메뉴에서 `↑ ↑ ↓ ↓ ← → ← → B A`를 입력하면 학번 없이 보스전 하나만 테스트하는 DEBUG 모드로 진입합니다.
 
 | 입력 | 동작 |
 | --- | --- |
@@ -77,9 +79,17 @@ Firebase 클라이언트 API 키는 공개 앱 설정값이며, 관리자 키는
 | --- | --- |
 | `project.godot` | Godot 프로젝트와 최종 버전 설정 |
 | `scenes/maps/` | 난이도별 맵 |
-| `scenes/combat_hud.tscn` | 전투 HUD, 클리어·게임 오버·일시정지 화면 |
-| `scenes/tutorial.tscn`, `scripts/tutorial.gd` | 연습장, 에디터에서 수정할 수 있는 안내창과 세 단계 진행 |
-| `scripts/level.gd` | 스폰, 적 수, 레벨 진행과 회복 아이템 |
+| `scenes/ui/combat_hud.tscn` | UI 씬 다섯 개를 조합하는 진입점 |
+| `scenes/ui/hud/` | 체력·점수·콤보와 전투 피드백 |
+| `scenes/ui/screens/`, `scenes/ui/dialogs/` | 결과·일시정지 화면과 나가기 확인창 |
+| `scenes/ui/main_menu.tscn`, `scenes/ui/transitions/` | 메인 메뉴와 화면 전환 |
+| `scripts/ui/`, `resources/ui/` | UI별 동작, 공통 테마·스타일·배경·셰이더 |
+| `scenes/gameplay/`, `scripts/gameplay/` | 플레이어·적·아이템·레벨 동작 |
+| `scripts/autoload/` | 게임 상태, 음악, 순위 서비스 |
+| `scenes/sandbox/` | 편집·실험용 씬; 배포 파일에서 제외 |
+| `scripts/gameplay/onboarding.gd` | 첫 플레이의 대시·6종 적·9종 문양 연습 |
+| `scripts/gameplay/boss_level.gd`, `scripts/effects/boss_attack.gd` | 난이도별 기존 맵의 6레벨 보스, 체력바·공격·경고·파티클·효과음 |
+| `scripts/gameplay/level.gd` | 스폰, 적 수, 레벨 진행과 회복 아이템 |
 | `scripts/gestures/`, `resources/patterns/` | 기호 인식과 패턴 예시 |
 | `image_assets/`, `sounds/` | 이미지와 효과음 |
 | `docs/` | 동아리 순위 사이트와 개발 문서 |
@@ -87,6 +97,8 @@ Firebase 클라이언트 API 키는 공개 앱 설정값이며, 관리자 키는
 
 Godot 4.7.1에서 `project.godot`를 열어 편집할 수 있습니다. 게임 구조와 조정 항목은 [전투·레벨 문서](docs/combat.md)에 정리했습니다.
 
+화면별 수정 위치와 UI 연결 방법은 [UI 파일 안내](scenes/ui/README.md)를 참고하세요. 원본 애셋과 난이도별 맵 폴더는 각각 기존 구조를 유지합니다.
+
 사이트는 [기존 동아리 사이트](https://github.com/Un-Uclied/pygamebu-dongari/tree/main/docs)의 디자인을 이어 사용합니다. 상품·부스 안내는 `docs/site-content.json`, 화면과 스타일은 `docs/index.html`과 `docs/style.css`에서 수정합니다. 원본 출처와 폰트 라이선스는 [사이트 출처](docs/SOURCE.md), [폰트 라이선스](docs/FONT-LICENSE.txt)에 있습니다. GitHub Pages는 `main` 브랜치의 `/docs`에서 배포합니다.
 
-최종 버전 **1.1.1**에는 튜토리얼과 최신 안내를 포함했습니다. Windows 실행 파일과 ZIP은 위 다운로드 링크에서 받을 수 있습니다.
+위 다운로드의 배포 버전은 **1.1.1**입니다. 이번 QA 개편은 프로젝트 소스에 반영되어 있으며, 기존 실행 파일·ZIP에는 아직 포함되지 않았습니다.

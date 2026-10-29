@@ -1,0 +1,26 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/gameplay/enemies/enemy_projectile.tscn" id="1"]
+[ext_resource type="Script" path="res://scripts/gameplay/boss_projectile.gd" id="2"]
+
+[sub_resource type="Gradient" id="White"]
+offsets = PackedFloat32Array(0, 0.45, 0.8, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.65, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="Orb"]
+gradient = SubResource("White")
+width = 16
+height = 16
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0.5, 0)
+
+[node name="BossProjectile" instance=ExtResource("1")]
+script = ExtResource("2")
+
+[node name="Glow" parent="." index="0"]
+modulate = Color(1, 0.78, 0.35, 0.28)
+
+[node name="Orb" parent="." index="1"]
+modulate = Color(1, 0.78, 0.35, 1)
+texture = SubResource("Orb")

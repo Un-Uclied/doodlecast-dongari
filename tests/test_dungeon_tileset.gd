@@ -37,7 +37,7 @@ func test_tileset() -> void:
 	assert(layer.tile_set == tileset and layer.texture_filter == CanvasItem.TEXTURE_FILTER_NEAREST)
 	assert(layer.get_used_cells().is_empty())
 	layer.free()
-	var map := (load("res://scenes/test_scene.tscn") as PackedScene).instantiate()
+	var map := (load("res://scenes/sandbox/test_scene.tscn") as PackedScene).instantiate()
 	root.add_child(map)
 	await physics_frame
 	await process_frame

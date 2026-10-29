@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://bcf2wadlkpunp"]
+
+[ext_resource type="Script" uid="uid://ckgihywd6fveu" path="res://scripts/ui/combat_hud.gd" id="3_hud"]
+[ext_resource type="Theme" uid="uid://di013qfonntde" path="res://resources/ui/menu_theme.tres" id="5_theme"]
+
+[ext_resource type="PackedScene" path="res://scenes/ui/hud/combat_feedback.tscn" id="hud_feedback"]
+
+[ext_resource type="PackedScene" path="res://scenes/ui/hud/status_bar.tscn" id="hud_status"]
+
+[ext_resource type="PackedScene" path="res://scenes/ui/screens/results_screen.tscn" id="screen_results"]
+
+[ext_resource type="PackedScene" path="res://scenes/ui/screens/pause_screen.tscn" id="screen_pause"]
+
+[ext_resource type="PackedScene" path="res://scenes/ui/dialogs/exit_confirmation.tscn" id="dialog_exit"]
+
+[node name="HUD" type="CanvasLayer" unique_id=284878472]
+process_mode = 3
+layer = 20
+script = ExtResource("3_hud")
+
+[node name="Root" type="Control" parent="." unique_id=463854003]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("5_theme")
+
+[node name="CombatFeedback" parent="Root" unique_id=1566960519 instance=ExtResource("hud_feedback")]
+unique_name_in_owner = true
+
+[node name="Top" parent="Root" unique_id=1446507288 instance=ExtResource("hud_status")]
+unique_name_in_owner = true
+
+[node name="Results" parent="Root" unique_id=1203096231 instance=ExtResource("screen_results")]
+unique_name_in_owner = true
+visible = false
+
+[node name="Paused" parent="Root" unique_id=1677509945 instance=ExtResource("screen_pause")]
+unique_name_in_owner = true
+visible = false
+
+[node name="MenuConfirmation" parent="Root" unique_id=1555462104 instance=ExtResource("dialog_exit")]
+unique_name_in_owner = true
+visible = false

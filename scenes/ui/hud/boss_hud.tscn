@@ -1,0 +1,114 @@
+[gd_scene format=3]
+
+[ext_resource type="FontFile" path="res://fonts/Cafe24PROUP.ttf" id="1"]
+[ext_resource type="Theme" path="res://resources/ui/menu_theme.tres" id="2"]
+[ext_resource type="AudioStream" path="res://sounds/warning.mp3" id="3"]
+[ext_resource type="AudioStream" path="res://sounds/explosion.wav" id="4"]
+[ext_resource type="AudioStream" path="res://sounds/dash.wav" id="5"]
+[ext_resource type="AudioStream" path="res://sounds/magic_success.wav" id="6"]
+
+[sub_resource type="StyleBoxFlat" id="Card"]
+content_margin_left = 12.0
+content_margin_top = 6.0
+content_margin_right = 12.0
+content_margin_bottom = 8.0
+bg_color = Color(0.065, 0.025, 0.09, 0.92)
+border_width_bottom = 1
+border_color = Color(0.69, 0.43, 0.62, 0.8)
+
+[sub_resource type="StyleBoxFlat" id="Background"]
+bg_color = Color(0.13, 0.045, 0.15, 1)
+
+[sub_resource type="StyleBoxFlat" id="Trail"]
+bg_color = Color(1, 0.78, 0.35, 1)
+
+[sub_resource type="StyleBoxEmpty" id="Empty"]
+
+[sub_resource type="StyleBoxFlat" id="Health"]
+bg_color = Color(0.83, 0.12, 0.48, 1)
+
+[node name="BossHealth" type="PanelContainer" unique_id=1902123675]
+custom_minimum_size = Vector2(300, 58)
+size_flags_horizontal = 0
+size_flags_vertical = 4
+mouse_filter = 2
+theme = ExtResource("2")
+theme_override_styles/panel = SubResource("Card")
+
+[node name="Rows" type="VBoxContainer" parent="." unique_id=1457302408]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 5
+
+[node name="Header" type="HBoxContainer" parent="Rows" unique_id=272250341]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Name" type="Label" parent="Rows/Header" unique_id=2119529133]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("1")
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(1, 0.85, 0.57, 1)
+text = "마왕"
+
+[node name="BossPhase" type="Label" parent="Rows/Header" unique_id=1427476132]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.88, 0.68, 0.87, 1)
+text = "1페이즈"
+
+[node name="Bars" type="Control" parent="Rows" unique_id=1658246004]
+custom_minimum_size = Vector2(0, 12)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="HealthTrail" type="ProgressBar" parent="Rows/Bars" unique_id=288198580]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/background = SubResource("Background")
+theme_override_styles/fill = SubResource("Trail")
+max_value = 200.0
+value = 200.0
+show_percentage = false
+
+[node name="HealthBar" type="ProgressBar" parent="Rows/Bars" unique_id=1949430673]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/background = SubResource("Empty")
+theme_override_styles/fill = SubResource("Health")
+max_value = 200.0
+value = 200.0
+show_percentage = false
+
+[node name="Audio" type="Node" parent="." unique_id=1479025399]
+process_mode = 1
+
+[node name="Warning" type="AudioStreamPlayer" parent="Audio" unique_id=325145735]
+stream = ExtResource("3")
+volume_db = -12.0
+
+[node name="Fire" type="AudioStreamPlayer" parent="Audio" unique_id=326505699]
+stream = ExtResource("4")
+volume_db = -5.0
+
+[node name="Rush" type="AudioStreamPlayer" parent="Audio" unique_id=1671010291]
+stream = ExtResource("5")
+volume_db = -12.0
+
+[node name="Hit" type="AudioStreamPlayer" parent="Audio" unique_id=158747930]
+stream = ExtResource("6")
+volume_db = -10.0

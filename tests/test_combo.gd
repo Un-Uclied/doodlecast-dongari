@@ -58,22 +58,22 @@ func test_combo() -> void:
 	level.canvas.gesture_finished.emit({"pattern_id": &"horizontal"}, 0, 1)
 	assert(GameRun.combo_meter == 64.5 and GameRun.combo_rank == 3, "Six simultaneous kills must no longer instantly fill the gauge")
 	assert(GameRun.combat_score == 6 * 98, "All simultaneous kills must use the same earned A multiplier")
-	assert(level.hud.get_node("%ComboRank").text == "A  ×1.3")
-	assert(level.hud.get_node("%ComboGauge").value == 64.5)
+	assert(level.hud.get_node("Root/Top/%ComboRank").text == "A  ×1.3")
+	assert(level.hud.get_node("Root/Top/%ComboGauge").value == 64.5)
 	# Step the short impact explicitly so first-use shader compilation cannot skip it.
-	var impact: Tween = level.hud._remaining_tween
+	var impact: Tween = level.hud.status._remaining_tween
 	impact.pause()
 	impact.custom_step(0.04)
-	assert(level.hud.get_node("%Remaining").scale.x > 1.0, "A kill must enlarge the remaining-enemies label")
-	var score: Label = level.hud.get_node("%Score")
-	var gauge: ProgressBar = level.hud.get_node("%ComboGauge")
+	assert(level.hud.get_node("Root/Top/%Remaining").scale.x > 1.0, "A kill must enlarge the remaining-enemies label")
+	var score: Label = level.hud.get_node("Root/Top/%Score")
+	var gauge: ProgressBar = level.hud.get_node("Root/Top/%ComboGauge")
 	assert(gauge.get_global_rect().position.y >= score.get_global_rect().end.y, "The combo gauge must be below the yellow score text")
 	if DisplayServer.get_name() != "headless":
 		await RenderingServer.frame_post_draw
 		assert(get_viewport().get_texture().get_image().save_png("res://.godot/combo-impact-preview.png") == OK)
 	impact.play()
 	await get_tree().create_timer(0.35).timeout
-	assert(level.hud.get_node("%Remaining").scale.is_equal_approx(Vector2.ONE), "The impact must restore the label's original scale")
+	assert(level.hud.get_node("Root/Top/%Remaining").scale.is_equal_approx(Vector2.ONE), "The impact must restore the label's original scale")
 	level.canvas.gesture_finished.emit({"pattern_id": &"star"}, 0, 1)
 	assert(GameRun.combo_meter == 64.5, "A recognized but unmatched pattern must not be treated as an unrecognized drawing")
 	level.canvas.gesture_finished.emit({"pattern_id": &""}, 0, 1)

@@ -22,7 +22,7 @@ func test_movement() -> void:
 		await get_tree().process_frame
 	var enemy = await level.spawn_enemy(0)
 	assert(enemy != null)
-	var defaults := (load("res://scenes/enemy.tscn") as PackedScene).instantiate()
+	var defaults := (load("res://scenes/gameplay/enemies/enemy.tscn") as PackedScene).instantiate()
 	assert(enemy.speed == defaults.speed, "Spawning must preserve the speed configured on the enemy")
 	defaults.free()
 	enemy.set_physics_process(false)

@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="PatternDefinition" format=3 uid="uid://bfq77aswmwpo6"]
+
+[ext_resource type="Script" uid="uid://38p8rxpvq4ik" path="res://scripts/gestures/pattern_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = &"square"
+display_name = "네모"
+samples = Array[PackedVector2Array]([PackedVector2Array(0, 0, 1, 0, 1, 1, 0, 1, 0, 0), PackedVector2Array(0.5, 0, 1, 0.5, 0.5, 1, 0, 0.5, 0.5, 0)])
+closed = true
+rotation_invariant = true
+max_error = 0.095

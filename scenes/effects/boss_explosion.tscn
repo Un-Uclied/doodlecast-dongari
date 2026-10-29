@@ -1,0 +1,97 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/effects/boss_explosion.gd" id="1"]
+[ext_resource type="Shader" path="res://resources/effects/boss_shockwave.gdshader" id="2"]
+[ext_resource type="Texture2D" path="res://resources/effects/soft_particle.tres" id="3"]
+
+[sub_resource type="CanvasItemMaterial" id="SmokeMaterial"]
+light_mode = 1
+
+[sub_resource type="Curve" id="Expand"]
+_data = [Vector2(0, 0.3), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Gradient" id="SmokeRamp"]
+offsets = PackedFloat32Array(0, 0.15, 0.6, 1)
+colors = PackedColorArray(0.18, 0.07, 0.2, 0, 0.23, 0.11, 0.25, 0.42, 0.12, 0.06, 0.16, 0.28, 0.1, 0.04, 0.13, 0)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_upv48"]
+resource_local_to_scene = true
+shader = ExtResource("2")
+shader_parameter/progress = 0.0
+shader_parameter/radius = 32.0
+
+[sub_resource type="CanvasItemMaterial" id="Glow"]
+blend_mode = 1
+light_mode = 1
+
+[sub_resource type="Gradient" id="Pixel"]
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="Streak"]
+gradient = SubResource("Pixel")
+width = 2
+height = 6
+
+[sub_resource type="Curve" id="Shrink"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0.05), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Gradient" id="Fire"]
+offsets = PackedFloat32Array(0, 0.2, 0.7, 1)
+colors = PackedColorArray(1, 0.95, 0.7, 1, 1, 0.72, 0.2, 1, 1, 0.2, 0.025, 0.7, 0.6, 0.06, 0.02, 0)
+
+[node name="BossExplosion" type="Node2D" unique_id=1689899237]
+z_index = 1
+script = ExtResource("1")
+
+[node name="Smoke" type="CPUParticles2D" parent="." unique_id=1379672715]
+material = SubResource("SmokeMaterial")
+emitting = false
+amount = 18
+texture = ExtResource("3")
+lifetime = 0.9
+one_shot = true
+explosiveness = 1.0
+emission_shape = 1
+emission_sphere_radius = 8.0
+direction = Vector2(0, -1)
+spread = 100.0
+gravity = Vector2(0, -8)
+initial_velocity_min = 8.0
+initial_velocity_max = 24.0
+scale_amount_min = 0.4
+scale_amount_max = 1.3
+scale_amount_curve = SubResource("Expand")
+color_ramp = SubResource("SmokeRamp")
+
+[node name="Shockwave" type="Polygon2D" parent="." unique_id=1220168903]
+material = SubResource("ShaderMaterial_upv48")
+polygon = PackedVector2Array(-36, -36, 36, -36, 36, 36, -36, 36)
+
+[node name="Sparks" type="CPUParticles2D" parent="." unique_id=714762712]
+texture_filter = 1
+material = SubResource("Glow")
+emitting = false
+amount = 72
+texture = SubResource("Streak")
+lifetime = 0.4
+one_shot = true
+explosiveness = 1.0
+emission_shape = 1
+emission_sphere_radius = 4.0
+particle_flag_align_y = true
+direction = Vector2(0, -1)
+spread = 180.0
+gravity = Vector2(0, 55)
+initial_velocity_min = 55.0
+initial_velocity_max = 125.0
+scale_amount_min = 0.3
+scale_amount_curve = SubResource("Shrink")
+color_ramp = SubResource("Fire")
+
+[node name="Flash" type="PointLight2D" parent="." unique_id=1752632419]
+color = Color(1, 0.52, 0.12, 1)
+energy = 0.65
+texture = ExtResource("3")
+texture_scale = 4.0

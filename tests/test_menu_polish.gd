@@ -1,6 +1,6 @@
 extends Node
 
-const HUD := preload("res://scripts/combat_hud.gd")
+const HUD := preload("res://scripts/ui/combat_hud.gd")
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
@@ -31,11 +31,12 @@ func test_menus() -> void:
 	assert(HUD.format_number(0) == "0" and HUD.format_number(19862) == "19,862" and HUD.format_number(-1663) == "-1,663")
 	assert(HUD.format_number(1234567890) == "1,234,567,890")
 	assert(HUD.format_duration(59.99) == "00:59.9" and HUD.format_duration(60.0) == "01:00.0" and HUD.format_duration(166.3) == "02:46.3")
-	var menu = load("res://scenes/main_menu.tscn").instantiate()
+	var menu = load("res://scenes/ui/main_menu.tscn").instantiate()
 	get_tree().root.add_child(menu)
 	get_tree().current_scene = menu
 	await tick()
 	menu.student_id_input.text = "11013"
+	Leaderboard.tutorials["11013".sha256_text()] = 1
 	menu.name_input.text = "홍길동"
 	menu._start(1)
 	assert(SceneTransition.transitioning and get_tree().paused and get_tree().current_scene == menu)
@@ -64,9 +65,9 @@ func test_menus() -> void:
 	level._update_hud()
 	level._toggle_pause()
 	assert(get_tree().paused and level.hud.get_node("%Paused").visible and not level.hud.get_node("Root/Top").visible)
-	assert(level.hud.get_node("%Resume").has_focus() and level.hud.get_node("%PauseMenu").text == "메인 메뉴로")
+	assert(level.hud.get_node("Root/Paused/%Resume").has_focus() and level.hud.get_node("Root/Paused/%PauseMenu").text == "메인 메뉴로")
 	assert(level.hud.get_node("%Paused").material == level.hud.get_node("%Results").material)
-	var frame_style: StyleBoxFlat = level.hud.get_node("%ResultTitle").get_parent().get_parent().get_theme_stylebox("panel")
+	var frame_style: StyleBoxFlat = level.hud.get_node("Root/Results/%ResultTitle").get_parent().get_parent().get_theme_stylebox("panel")
 	assert(frame_style.bg_color.r > frame_style.bg_color.g and frame_style.corner_radius_top_left == 0, "Use a plum pixel frame with warm gold ornament")
 	var elapsed := GameRun.elapsed_seconds
 	await get_tree().create_timer(0.25).timeout
@@ -85,22 +86,22 @@ func test_menus() -> void:
 				if maxf(absf(before.r - after.r), maxf(absf(before.g - after.g), absf(before.b - after.b))) > 0.004:
 					changed += 1
 		assert(changed > 100, "The faint scrolling shader must keep moving while gameplay is paused")
-	level.hud.get_node("%PauseMenu").grab_focus()
-	level.hud.get_node("%PauseMenu").pressed.emit()
+	level.hud.get_node("Root/Paused/%PauseMenu").grab_focus()
+	level.hud.get_node("Root/Paused/%PauseMenu").pressed.emit()
 	assert(level.hud.get_node("%MenuConfirmation").visible and get_tree().paused and not SceneTransition.transitioning and GameRun.active)
-	assert(level.hud.get_node("%ExitCancel").has_focus(), "Opening confirmation must focus the safe cancel action")
-	level.hud.get_node("%Resume").pressed.emit()
+	assert(level.hud.get_node("Root/MenuConfirmation/%ExitCancel").has_focus(), "Opening confirmation must focus the safe cancel action")
+	level.hud.get_node("Root/Paused/%Resume").pressed.emit()
 	assert(get_tree().paused, "The pause menu behind confirmation must not resume gameplay")
 	await press_key(KEY_TAB)
-	assert(level.hud.get_node("%ExitConfirm").has_focus())
+	assert(level.hud.get_node("Root/MenuConfirmation/%ExitConfirm").has_focus())
 	await press_key(KEY_TAB)
-	assert(level.hud.get_node("%ExitCancel").has_focus(), "Keyboard focus must stay inside the confirmation")
+	assert(level.hud.get_node("Root/MenuConfirmation/%ExitCancel").has_focus(), "Keyboard focus must stay inside the confirmation")
 	await press_key(KEY_ESCAPE)
-	assert(not level.hud.get_node("%MenuConfirmation").visible and get_tree().paused and level.hud.get_node("%PauseMenu").has_focus(), "Escape must close only confirmation and preserve pause/focus")
-	level.hud.get_node("%PauseMenu").pressed.emit()
-	level.hud.get_node("%ExitCancel").pressed.emit()
+	assert(not level.hud.get_node("%MenuConfirmation").visible and get_tree().paused and level.hud.get_node("Root/Paused/%PauseMenu").has_focus(), "Escape must close only confirmation and preserve pause/focus")
+	level.hud.get_node("Root/Paused/%PauseMenu").pressed.emit()
+	level.hud.get_node("Root/MenuConfirmation/%ExitCancel").pressed.emit()
 	assert(get_tree().paused and not level.hud.get_node("%MenuConfirmation").visible and GameRun.active)
-	level.hud.get_node("%Resume").pressed.emit()
+	level.hud.get_node("Root/Paused/%Resume").pressed.emit()
 	assert(not get_tree().paused and level.hud.get_node("Root/Top").visible)
 	level.set_process(false)
 	GameRun.elapsed_seconds = 166.3
@@ -111,12 +112,12 @@ func test_menus() -> void:
 	await get_tree().create_timer(0.95).timeout
 	var hud = level.hud
 	assert(hud.find_child("Retry", true, false) == null, "The first-level retry action must be removed")
-	assert(hud.get_node("%ResultTitle").text == "GAME OVER" and hud.get_node("%ResultTotal").text == "19,862")
-	assert(hud.get_node("%ResultLevelScore").text == "+2,159점" and hud.get_node("%ResultCombatScore").text == "21,525점")
-	assert(hud.get_node("%ResultPenalty").text == "-1,663점" and hud.get_node("%ResultElapsed").text == "02:46.3")
-	assert(hud.get_node("%ResultIdentity").text == "학번 11013  ·  홍*동")
-	assert(hud.get_node("%Menu").text == "메인 메뉴로" and hud.get_node("%Menu").has_focus() and not hud.get_node("%Continue").visible)
-	var result_card: Control = hud.get_node("%ResultTitle").get_parent().get_parent()
+	assert(hud.get_node("Root/Results/%ResultTitle").text == "GAME OVER" and hud.get_node("Root/Results/%ResultTotal").text == "19,862")
+	assert(hud.get_node("Root/Results/%ResultLevelScore").text == "+2,159점" and hud.get_node("Root/Results/%ResultCombatScore").text == "21,525점")
+	assert(hud.get_node("Root/Results/%ResultPenalty").text == "-1,663점" and hud.get_node("Root/Results/%ResultElapsed").text == "02:46.3")
+	assert(hud.get_node("Root/Results/%ResultIdentity").text == "학번 11013  ·  홍*동")
+	assert(hud.get_node("Root/Results/%Menu").text == "메인 메뉴로" and hud.get_node("Root/Results/%Menu").has_focus() and not hud.get_node("Root/Results/%Continue").visible)
+	var result_card: Control = hud.get_node("Root/Results/%ResultTitle").get_parent().get_parent()
 	await tick()
 	var bounds := result_card.get_global_rect()
 	assert(bounds.position.y >= 15.0 and bounds.end.y <= 633.0 and bounds.position.x >= 0, "The result card must fit the default viewport: %s" % bounds)
@@ -132,18 +133,18 @@ func test_menus() -> void:
 	var scroll: ScrollContainer = hud.get_node("%Results").get_node("Margin/Scroll")
 	scroll.scroll_vertical = int(scroll.get_v_scroll_bar().max_value)
 	await tick()
-	assert(hud.get_node("%Menu").get_global_rect().end.y <= 524.0, "The main-menu button must stay reachable in a short viewport")
-	hud.get_node("%Menu").pressed.emit()
+	assert(hud.get_node("Root/Results/%Menu").get_global_rect().end.y <= 524.0, "The main-menu button must stay reachable in a short viewport")
+	hud.get_node("Root/Results/%Menu").pressed.emit()
 	assert(hud.get_node("%MenuConfirmation").visible and not SceneTransition.transitioning and get_tree().current_scene == level)
-	hud.get_node("%Continue").pressed.emit()
+	hud.get_node("Root/Results/%Continue").pressed.emit()
 	assert(GameRun.level_number == 4, "Confirmation must block the next-level action behind it")
-	hud.get_node("%ExitCancel").pressed.emit()
-	assert(not get_tree().paused and not hud.get_node("%MenuConfirmation").visible and hud.get_node("%Menu").has_focus(), "Cancel must restore the result screen's original unpaused state and focus")
-	hud.get_node("%Menu").pressed.emit()
+	hud.get_node("Root/MenuConfirmation/%ExitCancel").pressed.emit()
+	assert(not get_tree().paused and not hud.get_node("%MenuConfirmation").visible and hud.get_node("Root/Results/%Menu").has_focus(), "Cancel must restore the result screen's original unpaused state and focus")
+	hud.get_node("Root/Results/%Menu").pressed.emit()
 	await tick()
 	if DisplayServer.get_name() != "headless":
 		await capture("res://.godot/menu-exit-confirm-preview.png")
-	hud.get_node("%ExitConfirm").pressed.emit()
+	hud.get_node("Root/MenuConfirmation/%ExitConfirm").pressed.emit()
 	assert(SceneTransition.transitioning and get_tree().paused)
 	await SceneTransition.finished
 	assert(get_tree().current_scene.name == "MainMenu" and not get_tree().paused)
@@ -156,20 +157,20 @@ func test_menus() -> void:
 	level.finish_level(true)
 	while not level.hud.get_node("%Results").visible:
 		await tick()
-	assert(level.hud.get_node("%Continue").visible and level.hud.get_node("%Continue").has_focus())
+	assert(level.hud.get_node("Root/Results/%Continue").visible and level.hud.get_node("Root/Results/%Continue").has_focus())
 	var combat_score := GameRun.combat_score
-	level.hud.get_node("%Continue").pressed.emit()
-	level.hud.get_node("%Continue").pressed.emit()
+	level.hud.get_node("Root/Results/%Continue").pressed.emit()
+	level.hud.get_node("Root/Results/%Continue").pressed.emit()
 	assert(GameRun.level_number == 2, "Repeated continue actions cannot skip levels")
 	await SceneTransition.finished
 	level = get_tree().current_scene
 	assert(level.level_number == 2 and GameRun.combat_score == combat_score)
 	level._toggle_pause()
-	level.hud.get_node("%PauseMenu").pressed.emit()
+	level.hud.get_node("Root/Paused/%PauseMenu").pressed.emit()
 	assert(get_tree().paused and not SceneTransition.transitioning and level.hud.get_node("%MenuConfirmation").visible)
-	level.hud.get_node("%ExitConfirm").pressed.emit()
-	level.hud.get_node("%ExitConfirm").pressed.emit()
-	level.hud.get_node("%ExitCancel").pressed.emit()
+	level.hud.get_node("Root/MenuConfirmation/%ExitConfirm").pressed.emit()
+	level.hud.get_node("Root/MenuConfirmation/%ExitConfirm").pressed.emit()
+	level.hud.get_node("Root/MenuConfirmation/%ExitCancel").pressed.emit()
 	assert(SceneTransition.transitioning and get_tree().paused, "Repeated confirmation/cancel actions must not interrupt the scene fade")
 	await SceneTransition.finished
 	assert(get_tree().current_scene.name == "MainMenu" and not get_tree().paused)

@@ -98,12 +98,9 @@ func test_heart() -> void:
 	assert(sprite.sprite_frames.get_frame_texture("idle", 5).atlas.get_size() == Vector2(192, 32))
 	assert(heart.get_node("Light").energy > 0.0 and heart.find_children("*", "Area2D").is_empty())
 	assert(heart.find_children("*", "Label").is_empty(), "The pickup must show a pattern badge instead of a text instruction")
-	var icon: Line2D = heart.get_node("Pattern/Icon")
-	assert(icon.points.size() >= 32 and icon.points[0].is_equal_approx(icon.points[-1]))
-	var icon_bounds := Rect2(icon.points[0], Vector2.ZERO)
-	for point in icon.points:
-		icon_bounds = icon_bounds.expand(point)
-	assert(icon_bounds.get_center().is_equal_approx(Vector2.ZERO) and is_equal_approx(icon_bounds.size.x, 9.0), "The heart glyph must match the enemies' centered 9px pattern style")
+	var badge: Node2D = heart.get_node("Pattern")
+	assert(badge.get_script() == load("res://scripts/gestures/pattern_badge.gd"))
+	assert(badge.local_rect().get_center().is_equal_approx(Vector2.ZERO) and badge.local_rect().size.x < 25, "Healing items must use the same compact centered badge as enemies")
 	await ticks(14)
 	assert(sprite.frame != 0, "The golden-heart sheet must actually animate")
 	await preview_heart(level, heart)
@@ -125,7 +122,7 @@ func test_heart() -> void:
 	assert(level._heart == null and level.player.health == 3 and GameRun.health == 3)
 	assert(GameRun.hits_taken == hits and GameRun.ranking_result(false).hits == hits, "Healing must not erase previously recorded hits")
 	assert(GameRun.combat_score == score and level.get_node("Effects").get_child_count() == 1)
-	assert(level.hud.get_node("%FeedbackText").text == "체력 +1" and level.get_node("MagicSuccessSound").playing)
+	assert(level.hud.get_node("Root/CombatFeedback/%FeedbackText").text == "체력 +1" and level.get_node("MagicSuccessSound").playing)
 	level._schedule_heart(1)
 	assert(level._heart_delay < 0.0, "Only one heart may spawn per level, including after collection")
 	if DisplayServer.get_name() != "headless":
@@ -142,6 +139,8 @@ func test_heart() -> void:
 	await ticks(2)
 	await test_critical_drop()
 	print("PASS: health-dependent drop odds, random 3–6s delay, eight-second/progress window, pause/late cancellation, one nearby safe-floor animated glowing heart, no touch/wrong-pattern pickup, real 48px heart mouse gesture heals once, full-health cap, accurate cumulative hits, healing FX and cleanup")
+	Music.stop()
+	await get_tree().create_timer(0.2).timeout
 	get_tree().quit()
 
 func test_critical_drop() -> void:

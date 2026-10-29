@@ -40,7 +40,7 @@ func test_juice() -> void:
 		await get_tree().process_frame
 	GameRun.elapsed_seconds = 12.3
 	level._update_hud()
-	assert(level.hud.get_node("%Score").text.contains("경과 00:12.3 · 감점 123점"), "Elapsed time must be positive and labeled separately from the time penalty")
+	assert(level.hud.get_node("Root/Top/%Score").text.contains("경과 00:12.3 · 감점 123점"), "Elapsed time must be positive and labeled separately from the time penalty")
 	GameRun.elapsed_seconds = 0.0
 	level._update_hud()
 	level.player.set_physics_process(false)
@@ -124,8 +124,8 @@ func test_juice() -> void:
 	assert(GameRun.elapsed_seconds == elapsed and not level.hud.get_node("%Results").visible, "The door reveal must precede the result overlay")
 	await get_tree().create_timer(2.5).timeout
 	assert(level.hud.get_node("%Results").visible)
-	assert(level.hud.get_node("%ResultPenalty").text == level.hud.format_number(GameRun.time_score()) + "점")
-	level.hud.get_node("%Continue").pressed.emit()
+	assert(level.hud.get_node("Root/Results/%ResultPenalty").text == level.hud.format_number(GameRun.time_score()) + "점")
+	level.hud.get_node("Root/Results/%Continue").pressed.emit()
 	await ticks(2)
 	assert(get_tree().current_scene.level_number == 2 and GameRun.elapsed_seconds >= elapsed)
 	GameRun.begin_run(0)

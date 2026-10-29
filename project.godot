@@ -11,9 +11,9 @@ config_version=5
 [application]
 
 config/name="DOODLECAST"
-config/version="1.1.1"
 config/description="DOODLECAST : 마법진을 그려 공격하고 적을 피하며 마왕성의 던전을 클리어 하세요."
-run/main_scene="res://scenes/main_menu.tscn"
+config/version="1.1.1"
+run/main_scene="res://scenes/ui/main_menu.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 boot_splash/show_image=false
 boot_splash/stretch_mode=0
@@ -23,10 +23,10 @@ config/icon="uid://cj4lhrswiind8"
 
 [autoload]
 
-GameRun="*res://scripts/game_run.gd"
-Music="*res://scripts/music.gd"
-SceneTransition="*res://scenes/scene_transition.tscn"
-Leaderboard="*res://scripts/leaderboard.gd"
+GameRun="*res://scripts/autoload/game_run.gd"
+Music="*res://scripts/autoload/music.gd"
+SceneTransition="*res://scenes/ui/transitions/scene_transition.tscn"
+Leaderboard="*res://scripts/autoload/leaderboard.gd"
 
 [display]
 

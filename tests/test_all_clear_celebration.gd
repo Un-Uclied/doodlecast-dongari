@@ -16,36 +16,36 @@ func test_celebration() -> void:
 		GameRun.health = 3
 		GameRun.hits_taken = 4
 		GameRun.defeated = 100
-		var hud = load("res://scenes/combat_hud.tscn").instantiate()
+		var hud = load("res://scenes/ui/combat_hud.tscn").instantiate()
 		get_tree().root.add_child(hud)
 		hud.set_results(sample[1], 1000)
-		var art: TextureRect = hud.get_node("%VictoryArt")
+		var art: TextureRect = hud.get_node("Root/Results/%VictoryArt")
 		assert(art.visible == sample[2], "Victory art belongs only on all clear")
 		assert(art.texture.resource_path == "res://image_assets/마법 지팡이를 든 승리의 픽셀 소년.png" and art.mouse_filter == Control.MOUSE_FILTER_IGNORE)
-		assert(not hud.get_node("%YaySound").playing and not hud.get_node("%Confetti").emitting)
+		assert(not hud.get_node("Root/Results/%YaySound").playing and not hud.get_node("Root/Results/%Confetti").emitting)
 		hud.show_results()
 		await get_tree().process_frame
 		await get_tree().process_frame
 		if sample[2]:
-			var card: Control = hud.get_node("%ResultTitle").get_parent().get_parent()
+			var card: Control = hud.get_node("Root/Results/%ResultTitle").get_parent().get_parent()
 			assert(art.size.x > 100.0 and art.size.y > 100.0)
 			assert(art.get_global_rect().end.x < card.get_global_rect().position.x, "The portrait must not cover the result text or buttons")
-		assert(hud.get_node("%ClearMessage").visible == sample[2])
-		assert(hud.get_node("%YaySound").playing == sample[2] and hud.get_node("%Confetti").emitting == sample[2])
+		assert(hud.get_node("Root/Results/%ClearMessage").visible == sample[2])
+		assert(hud.get_node("Root/Results/%YaySound").playing == sample[2] and hud.get_node("Root/Results/%Confetti").emitting == sample[2])
 		if sample[2]:
-			assert(hud.get_node("%ClearMessage").text == "마왕성 던전을 클리어 했습니다!")
-			assert(hud.get_node("%ResultTitle").text == "ALL CLEAR" and not hud.get_node("%Continue").visible)
+			assert(hud.get_node("Root/Results/%ClearMessage").text == "마왕성 던전을 클리어 했습니다!")
+			assert(hud.get_node("Root/Results/%ResultTitle").text == "ALL CLEAR" and not hud.get_node("Root/Results/%Continue").visible)
 			await get_tree().create_timer(0.12).timeout
-			var position: float = hud.get_node("%YaySound").get_playback_position()
+			var position: float = hud.get_node("Root/Results/%YaySound").get_playback_position()
 			hud.show_results()
 			await get_tree().create_timer(0.12).timeout
-			assert(hud.get_node("%YaySound").get_playback_position() > position, "Showing an already open result must not restart the celebration")
+			assert(hud.get_node("Root/Results/%YaySound").get_playback_position() > position, "Showing an already open result must not restart the celebration")
 			if DisplayServer.get_name() != "headless":
 				await get_tree().create_timer(0.55).timeout
 				await RenderingServer.frame_post_draw
 				var lit := get_viewport().get_texture().get_image()
 				assert(lit.save_png("res://.godot/all-clear-celebration-preview.png") == OK)
-				hud.get_node("%Confetti").hide()
+				hud.get_node("Root/Results/%Confetti").hide()
 				await RenderingServer.frame_post_draw
 				var background := get_viewport().get_texture().get_image()
 				var paper_pixels := 0
@@ -61,7 +61,7 @@ func test_celebration() -> void:
 				get_tree().root.content_scale_size = resolution
 				await get_tree().process_frame
 				await get_tree().process_frame
-				var card: Control = hud.get_node("%ResultTitle").get_parent().get_parent()
+				var card: Control = hud.get_node("Root/Results/%ResultTitle").get_parent().get_parent()
 				assert(art.get_global_rect().end.x < card.get_global_rect().position.x, "The portrait must leave results unobstructed at %s" % resolution)
 				if DisplayServer.get_name() != "headless" and resolution.x == 960:
 					await RenderingServer.frame_post_draw

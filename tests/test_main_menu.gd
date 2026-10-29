@@ -19,7 +19,7 @@ func test_menu() -> void:
 	assert(GameRun.student_id == "00123" and GameRun.masked_name == "남**수", "Retry must retain the masked player identity")
 	GameRun.set_player_info("", "")
 	var root := get_tree().root
-	var menu := (load("res://scenes/main_menu.tscn") as PackedScene).instantiate()
+	var menu := (load("res://scenes/ui/main_menu.tscn") as PackedScene).instantiate()
 	root.add_child(menu)
 	get_tree().current_scene = menu
 	var resolution := Vector2i(1152, 648)
