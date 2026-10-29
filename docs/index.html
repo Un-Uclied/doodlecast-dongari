@@ -7,13 +7,13 @@
   <meta name="description" content="광남고등학교 파이게임부 동아리 발표회 · 게임 순위와 전체 부스 안내">
   <title>파이게임부 — 동아리 발표회</title>
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="style.css">
-  <script type="module" src="app.mjs"></script>
+  <link rel="stylesheet" href="style.css?v=20261030-scroll">
+  <script type="module" src="app.mjs?v=20261030-scroll"></script>
 </head>
 <body>
   <header class="masthead">
     <a class="brand" href="./" aria-label="파이게임부 홈">파이게임부<span class="edition">광남고등학교 · 동아리 발표회</span></a>
-    <div class="tools"><span id="connection" class="connection" role="status">연결 확인 중</span><button id="fullscreen" type="button">전체 화면</button></div>
+    <div class="tools"><span id="connection" class="connection" role="status">연결 확인 중</span><button id="auto-scroll" type="button" aria-pressed="true">자동 스크롤 멈추기</button><button id="fullscreen" type="button">전체 화면</button></div>
   </header>
   <main>
     <section class="competition" aria-labelledby="ranking-title">
@@ -21,14 +21,14 @@
       <div id="podium" class="podium" aria-label="현재 상위 3명"></div>
       <section class="rankings" aria-labelledby="all-ranks-title">
         <div class="list-heading"><h2 id="all-ranks-title">전체 순위</h2><p>참가자별 최고 기록 · <span id="participant-count">0명</span></p></div>
-        <div class="table-wrap" role="region" aria-label="전체 참가자 순위, 아래로 스크롤" tabindex="0"><table><thead><tr><th scope="col">순위</th><th scope="col">참가자</th><th scope="col">난이도 / 플레이 기록</th><th scope="col">점수</th></tr></thead><tbody id="ranking-rows"></tbody></table></div>
+        <div class="table-wrap" role="region" aria-label="자동으로 왕복 스크롤되는 전체 참가자 순위" tabindex="0"><table><thead><tr><th scope="col">순위</th><th scope="col">참가자</th><th scope="col">난이도 / 플레이 기록</th><th scope="col">점수</th></tr></thead><tbody id="ranking-rows"></tbody></table></div>
         <div id="empty-state" class="empty-state"><div><strong>첫 번째 주인공을 기다립니다.</strong><p>게임을 마친 뒤 기록이 저장되면 여기에 표시됩니다.</p></div></div>
       </section>
       <p class="rules-note">참가자별 최고 점수 반영 · 동점: 피격이 적은 기록 → 먼저 저장된 기록</p>
     </section>
     <aside class="booths" aria-labelledby="booths-title">
       <div class="booth-heading"><p class="eyebrow">파이게임부 부스 안내</p><h2 id="booths-title">다른 도전은<br>어디로?</h2><p>동아리원들이 준비한 게임 일부를 소개합니다.<br>이외에도 다양한 동아리 게임을 현장에서 만나보세요.</p></div>
-      <div id="booth-list" role="region" aria-label="동아리 게임 소개" tabindex="0"></div>
+      <div id="booth-list" role="region" aria-label="자동으로 왕복 스크롤되는 동아리 게임 소개" tabindex="0"></div>
       <div class="booth-footer"><p>플레이하고, 즐기고, 교류하고,<br><strong>다 같이 만드는 발표회.</strong></p></div>
     </aside>
   </main>

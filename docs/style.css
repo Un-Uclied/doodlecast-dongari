@@ -23,4 +23,16 @@ footer{display:flex;justify-content:space-between;gap:20px;margin:6px 3.2vw 0;pa
 .play-record{white-space:normal}.run-summary{display:block;font-weight:650;color:var(--muted);line-height:1.5}.run-detail{display:block;line-height:1.6;word-break:keep-all;margin-top:3px}
 
 #booth-list:focus-visible{outline:3px solid var(--sky);outline-offset:4px}
-@media(min-width:851px){#booth-list{max-height:clamp(240px,52vh,620px);overflow-y:auto;padding-right:12px;scrollbar-color:#91b3dd #f2f7fc;scrollbar-width:thin}}
+@media(min-width:851px){
+  body{height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+  .masthead,body>footer{flex-shrink:0}
+  main{flex:1;min-height:0;grid-template-rows:minmax(0,1fr)}
+  .competition,.booths{display:flex;flex-direction:column;min-height:0}
+  .section-heading,.podium,.rules-note,.booth-heading,.booth-footer,.list-heading{flex-shrink:0}
+  .rankings{flex:1;min-height:0;display:flex;flex-direction:column}
+  .table-wrap{flex:1;min-height:0;max-height:none}
+  #booth-list{flex:1;min-height:0;overflow-y:auto;padding-right:12px;scrollbar-color:#91b3dd #f2f7fc;scrollbar-width:thin}
+  .table-wrap,#booth-list{overflow-anchor:none;scroll-behavior:auto;overscroll-behavior:contain}
+  .booth-footer{margin-top:16px;padding:16px 0}
+}
+@media(max-width:850px){#auto-scroll{display:none}}

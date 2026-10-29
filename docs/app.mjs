@@ -1,9 +1,11 @@
 import {rankPlayers,formatPlayRecord} from './ranking.mjs';
+import {startAutoScroll} from './auto-scroll.mjs';
 
 const $ = id => document.getElementById(id);
 const number = n => new Intl.NumberFormat('ko-KR').format(n);
 let prizes = [], previous = new Map(), hasServerSnapshot = false;
 const demo = new URLSearchParams(location.search).get('demo') === '1';
+startAutoScroll($('auto-scroll'), [[document.querySelector('.table-wrap'), 24], [$('booth-list'), 18]]);
 function el(tag, className, value) {const node=document.createElement(tag); if(className)node.className=className;if(value!==undefined)node.textContent=value;return node;}
 function state(message, status='') { $('connection').textContent=message;$('connection').className=`connection ${status}`; }
 function render(records=[]) {
