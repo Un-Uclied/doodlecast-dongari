@@ -12,7 +12,7 @@ config_version=5
 
 config/name="DOODLECAST"
 config/description="DOODLECAST : 마법진을 그려 공격하고 적을 피하며 마왕성의 던전을 클리어 하세요."
-config/version="1.1.1"
+config/version="1.1.2"
 run/main_scene="res://scenes/ui/main_menu.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 boot_splash/show_image=false
