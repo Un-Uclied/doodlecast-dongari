@@ -1,7 +1,7 @@
 export function startAutoScroll(button, regions) {
   if (!button) return;
   const desktop = matchMedia('(min-width: 851px)');
-  let enabled = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let enabled = true;
   const label = () => {
     button.textContent = enabled ? '자동 스크롤 멈추기' : '자동 스크롤 켜기';
     button.setAttribute('aria-pressed', String(enabled));

@@ -3,7 +3,7 @@ import {startAutoScroll} from '../docs/auto-scroll.mjs';
 
 const originals = new Map(['matchMedia','performance','document','requestAnimationFrame'].map(key => [key,Object.getOwnPropertyDescriptor(globalThis,key)]));
 let now = 0, frames = [];
-const desktop = {matches:true}, reduced = {matches:false};
+const desktop = {matches:true};
 const target = (height = 120) => ({
   scrollTop:0, scrollHeight:height, clientHeight:100, events:{}, attributes:{},
   addEventListener(name, fn) {this.events[name] = fn;},
@@ -16,7 +16,7 @@ const tick = milliseconds => {
 };
 try {
   for (const [key,value] of Object.entries({
-    matchMedia: query => query.includes('min-width') ? desktop : reduced,
+    matchMedia: () => desktop,
     performance:{now:() => now}, document:{hidden:false},
     requestAnimationFrame: frame => frames.push(frame)
   })) Object.defineProperty(globalThis,key,{value,configurable:true,writable:true});
@@ -45,13 +45,7 @@ try {
   assert.equal(games.scrollTop,3);
   desktop.matches = true; games.scrollHeight = 105; tick(100);
   assert.equal(games.scrollTop,1);
-  reduced.matches = true;
-  const quietButton = target(), quietRegion = target();
-  startAutoScroll(quietButton, [[quietRegion,20]]);
-  tick(5000); tick(100);
-  assert.equal(quietRegion.scrollTop,0);
-  assert.equal(quietButton.attributes['aria-pressed'],'false');
-  console.log('auto-scroll: initial/end holds, reversal, interaction timeout, independent regions, toggle, mobile, resize and reduced motion');
+  console.log('auto-scroll: automatic start, initial/end holds, reversal, interaction timeout, independent regions, toggle, mobile and resize');
 } finally {
   for (const [key,descriptor] of originals) {
     if (descriptor) Object.defineProperty(globalThis,key,descriptor);
